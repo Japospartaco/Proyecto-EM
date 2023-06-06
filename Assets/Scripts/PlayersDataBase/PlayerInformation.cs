@@ -8,6 +8,7 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private string username;
     [SerializeField] private GameObject fighterObject;
     [SerializeField] private int currentLobbyId;
+    [SerializeField] private int idInLobby;
 
     public ulong Id
     {
@@ -33,12 +34,27 @@ public class PlayerInformation : MonoBehaviour
         set { currentLobbyId = value; }
     }
 
-    public void InitializePlayer(ulong id, string username, GameObject fighterObject, int currentLobbyId)
+    public int IdInLobby
+    {
+        get { return idInLobby; }
+        set {idInLobby = value; }
+    }
+
+    //METODO PARA INICILIZAR VALORES (SIMILAR A CONSTRUCTOR)
+    public void InitializePlayer(ulong id, string username, GameObject fighterObject, int currentLobbyId, int idInLobby)
     {
         this.id = id;
         this.username = username;   
         this.fighterObject = fighterObject; 
         this.currentLobbyId = currentLobbyId;
+        this.idInLobby = idInLobby;
+    }
+
+    //METODO PARA RESTAURAR LOS VALORES RELACIONADOS CON "LOBBY" AL SALIR DE UNA
+    public void ResetAfterExitingLobby()
+    {
+        currentLobbyId = -1;
+        idInLobby = -1;
     }
 
 
