@@ -1073,6 +1073,16 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 1279163059010513274, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 7467422803991183054, guid: eefd1982948af6448a89a5714bb66417, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -1216,7 +1226,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &412585104
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5421,7 +5431,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -3
   m_Sprite: {fileID: 1184664982, guid: 9992e8993f7f64ea7ac2d2c98d360a67, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -5745,7 +5755,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -3
   m_Sprite: {fileID: 1184664982, guid: 9992e8993f7f64ea7ac2d2c98d360a67, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -11881,7 +11891,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -3
   m_Sprite: {fileID: 1184664982, guid: 9992e8993f7f64ea7ac2d2c98d360a67, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -15348,6 +15358,8 @@ GameObject:
   - component: {fileID: 1769254125}
   - component: {fileID: 1769254124}
   - component: {fileID: 1769254126}
+  - component: {fileID: 1769254128}
+  - component: {fileID: 1769254127}
   m_Layer: 0
   m_Name: UI
   m_TagString: UI Manager
@@ -15403,6 +15415,41 @@ MonoBehaviour:
   FighterSelectorUIObject: {fileID: 2025362546}
   usernameInput: {fileID: 96445266}
   logInButton: {fileID: 509320873}
+--- !u!114 &1769254127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1769254123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3249287101
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &1769254128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1769254123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd2d54469c4f0d2449e57f4c959d6d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fighterSelectorUIObject: {fileID: 2025362546}
+  readyButton: {fileID: 695486426}
+  fighterSelectorInput: {fileID: 1448003292}
+  fightersPrefab:
+  - {fileID: 3010630682321582541, guid: 06b98e5343c113147985cd4116ac1cdb, type: 3}
+  - {fileID: 1279163059010513274, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+  - {fileID: 7467422803991183054, guid: eefd1982948af6448a89a5714bb66417, type: 3}
 --- !u!1 &1780285909
 GameObject:
   m_ObjectHideFlags: 0
