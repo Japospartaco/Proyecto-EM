@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PlayerInformation : MonoBehaviour
 {
-    private ulong id;
-    private string username;
-    private GameObject fighterObject;
-    private int currentLobbyId;
+    [SerializeField] private ulong id;
+    [SerializeField] private string username;
+    [SerializeField] private GameObject fighterObject;
+    [SerializeField] private int currentLobbyId;
 
     public ulong Id
     {
@@ -31,6 +31,14 @@ public class PlayerInformation : MonoBehaviour
     {
         get { return currentLobbyId; }
         set { currentLobbyId = value; }
+    }
+
+    public void InitializePlayer(ulong id, string username, GameObject fighterObject, int currentLobbyId)
+    {
+        this.id = id;
+        this.username = username;   
+        this.fighterObject = fighterObject; 
+        this.currentLobbyId = currentLobbyId;
     }
 
 

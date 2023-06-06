@@ -139,9 +139,8 @@ GameObject:
   - component: {fileID: 8653441937024262822}
   - component: {fileID: 1366263250}
   - component: {fileID: 1366263252}
-  - component: {fileID: -4209321848772228272}
   - component: {fileID: 7599666352982189107}
-  - component: {fileID: 8302389081930075885}
+  - component: {fileID: 504133363321729784}
   m_Layer: 6
   m_Name: Huntress
   m_TagString: Untagged
@@ -339,20 +338,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-4209321848772228272
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3010630682321582541}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e275c8ecd26cfe041a4b55ebe3b0e2a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
-  m_Animator: {fileID: 3010630682321582530}
 --- !u!114 &7599666352982189107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,7 +364,7 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
---- !u!114 &8302389081930075885
+--- !u!114 &504133363321729784
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -388,9 +373,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3010630682321582541}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aa9d7f7bf859024d8e9590cc8046778, type: 3}
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 3010630682321582530}
 --- !u!1 &3010630682471395148
 GameObject:
   m_ObjectHideFlags: 0
