@@ -27,7 +27,8 @@ namespace UI
         private void OnClientButtonClicked()
         {
             ServerClientUIObject.SetActive(false);
-            LogInUIObject.SetActive(true);
+            //LogInUIObject.SetActive(true);
+            NetworkManager.Singleton.StartClient();
         }
     }
 }

@@ -11,12 +11,12 @@ namespace Netcode
         public override void OnNetworkSpawn()
         {
             if (!IsOwner) return;
-            //InstantiateCharacterServerRpc(OwnerClientId);
+            InstantiateCharacterServerRpc(OwnerClientId);
 
-            string username = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<LogInUI>().GetUsernameInput();
-            ulong id = OwnerClientId;
+            //string username = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<LogInUI>().GetUsernameInput();
+           // ulong id = OwnerClientId;
 
-            NewClientServerRpc(username, id);
+            //NewClientServerRpc(username, id);
         }
 
         [ServerRpc]

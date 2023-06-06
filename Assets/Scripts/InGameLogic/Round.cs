@@ -13,13 +13,21 @@ public class Round
     List<GameObject> fighters_alive;
     List<GameObject> fighters_dead;
     GameObject winner;
+    bool draw;
+
+    Match match;
+
+    public bool Draw
+	{
+        get { return draw; }
+	}
 
     public GameObject Winner
     {
         get { return winner; }
     }
 
-    public Round(OnlinePlayers onlinePlayers, List<ulong> id_players, float time)
+    public Round(Match match, OnlinePlayers onlinePlayers, List<ulong> id_players, float time)
     {
 
         //this.id_players = id_players;
@@ -28,6 +36,15 @@ public class Round
         fighters_dead = new List<GameObject>();
         fighters_alive = new List<GameObject>();
         timer.Alarm += EndRoundByTimer;
+        draw = false;
+        this.match = match;
+
+        GameObject initPos = GameObject.FindGameObjectWithTag("Init Pos");
+
+        for (int i = 0; i < fighters.Count; i++)
+		{
+            fighters[i].transform.position = initPos.transform.GetChild(i).position;
+		}
     }
 
     public void StartRound()
@@ -97,7 +114,13 @@ public class Round
                 ganadores++;
             }
         }
-        if (ganadores > 1) winner = null;
+        if (ganadores > 1)
+        {
+            winner = null;
+            draw = true;
+        }
+
+        PrepareForNextRound();
     }
 
     public void FighterDies(object sender, int idInLobby)
@@ -110,30 +133,33 @@ public class Round
         if(fighters_alive.Count == 1)
         {
             EndRoundByLastOne();
-        }
+		}
+	}
+
+
+	private void EndRoundByLastOne()
+	{
+		if (fighters_alive[0] != null)
+		{
+			if (fighters_alive[0].GetComponent<HealthManager>().healthPoints > 0)
+			{
+				winner = fighters_alive[0];
+			}
+			else
+			{
+				//ESTA MUERTO
+			}
+		}
+		else
+		{
+			//ES NULL
+		}
+
+        PrepareForNextRound();
+
     }
 
-
-    private void EndRoundByLastOne()
-    {
-        if (fighters_alive[0] != null)
-        {
-            if (fighters_alive[0].GetComponent<HealthManager>().healthPoints > 0)
-            {
-                winner = fighters_alive[0];
-            }
-            else
-            {
-                //ESTA MUERTO
-            }
-        }
-        else
-        {
-            //ES NULL
-        }
-    }
-
-    private void RestoreAll()
+	private void RestoreAll()
     {
         foreach (var player in fighters_alive)
         {
@@ -143,6 +169,12 @@ public class Round
         {
             player.GetComponent<FighterMovement>().Revive();
         }
+    }
+
+    private void PrepareForNextRound()
+	{
+        RestoreAll();
+        match.EndRound(this);
     }
 
 }
