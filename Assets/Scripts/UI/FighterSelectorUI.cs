@@ -12,9 +12,14 @@ public class FighterSelectorUI : NetworkBehaviour
     [SerializeField] private List<GameObject> beforeRefreshHiddenObjects;
 
     [SerializeField] private List<TMP_Text> playersText;
+    
     [SerializeField] private GameObject fighterSelectorUIObject;
+    [SerializeField] private GameObject lobbySelectorUIObject;
+
     [SerializeField] private Button readyButton;
     [SerializeField] private Button refreshButton;
+    [SerializeField] private Button returnButton;
+    
     [SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
     private OnlinePlayers onlinePlayers;
@@ -27,6 +32,7 @@ public class FighterSelectorUI : NetworkBehaviour
         fighterSelectorUIObject.SetActive(false);
         readyButton.onClick.AddListener(OnReadyButtonPressed);
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
+        returnButton.onClick.AddListener(OnReturnButtonPressed);
 
         onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
         lobbyManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<LobbyManager>();
@@ -39,6 +45,17 @@ public class FighterSelectorUI : NetworkBehaviour
         return fighterSelectorInput.value;
     }
 
+    public void OnReturnButtonPressed()
+    {
+        ulong clientId = NetworkManager.LocalClientId;
+        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        Lobby lobby = lobbyManager.Lobbies[lobbyId];
+
+        lobby.RemovePlayerFromLobby(clientId);
+
+        fighterSelectorUIObject.SetActive(false);
+        lobbySelectorUIObject.SetActive(true);
+    }
 
     //METODO PARA ACTUALIZAR INTERFAZ
     public void OnRefreshButtonPressed()
@@ -95,12 +112,6 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         //IMPLEMENTAR EL SISTEMA DE READYS E INICIAR LA PARTIDA
         PlayerReadyServerRpc(NetworkManager.LocalClientId, GetSelectedFighter());
-
-        //CODIGO TEMPORAL QUE SPAWNEA PERSONAJE SEGUN PULSAS EL BOTON
-        ulong id = NetworkManager.LocalClientId;
-        int selectedFighter = GetSelectedFighter();
-        InstantiateCharacterServerRpc(id, selectedFighter);
-        fighterSelectorUIObject.SetActive(false);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -111,7 +122,9 @@ public class FighterSelectorUI : NetworkBehaviour
         Lobby lobby = lobbyManager.Lobbies[lobbyManager.GetPlayersLobby(playerId)];
         lobby.PlayerReady(playerId);
 
-        if (lobby.ReadyPlayers.Count >= lobby.PlayersInLobby / 2)
+        Debug.Log($"HAY {lobby.NumberOfReadyPlayers} JUGADORES LISTOS");
+
+        if (lobby.NumberOfReadyPlayers >= (lobby.PlayersInLobby / 2) + 1)
 
             //#################################### AQUI COMIENZA LA PARTIDA ##################################################
             StartGame(lobby);
@@ -121,16 +134,18 @@ public class FighterSelectorUI : NetworkBehaviour
     //####### METODO QUE COMIENZA LA PARTIDA ############
     private void StartGame(Lobby lobby)
     {
+        if (!IsServer) return;
         foreach (var player in lobby.PlayersList)
         {
-            InstantiateCharacterServerRpc(player.Id, player.SelectedFighter);
+            InstantiateCharacter(player.Id, player.SelectedFighter);
         }
+        StartGameClientRpc();
     }
 
 
-    [ServerRpc(RequireOwnership = false)]
-    public void InstantiateCharacterServerRpc(ulong id, int selectedFighter)
+    public void InstantiateCharacter(ulong id, int selectedFighter)
     {
+        if (!IsServer) return;
         GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter]);
 
         //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUEÑO
@@ -138,5 +153,11 @@ public class FighterSelectorUI : NetworkBehaviour
 
         characterGameObject.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         characterGameObject.transform.SetParent(transform, false);
+    }
+
+    [ClientRpc]
+    public void StartGameClientRpc()
+    {
+        fighterSelectorUIObject.SetActive(false);
     }
 }

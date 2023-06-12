@@ -34,6 +34,11 @@ public class Lobby
         get { return readyPlayers; }
     }
 
+    public int NumberOfReadyPlayers
+    {
+        get { return readyPlayers.Count; }
+    }
+
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
     {
         //ACTUALIZAR VALORES EN PLAYER INFORMATION
@@ -87,12 +92,17 @@ public class Lobby
         {
             if (id == playerId)
             {
+                Debug.Log("YA NO LISTO: " + id);
                 readyPlayers.Remove(id);
                 return;
             }
         }
 
         readyPlayers.Add(playerId);
+        foreach (var player in readyPlayers)
+        {
+            Debug.Log("LISTO:" + player);
+        }
     }
 
     public bool IsPlayerReady(ulong playerId)
@@ -109,7 +119,7 @@ public class Lobby
     public List<ulong> GetPlayersIdsList()
     {
         List<ulong> ids = new List<ulong>();
-        foreach(var player in playersInformation)
+        foreach (var player in playersInformation)
         {
             ids.Add(player.Id);
         }
