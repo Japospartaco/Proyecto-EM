@@ -24,14 +24,6 @@ public class LogInUI : MonoBehaviour
         LobbySelectorUIObject.SetActive(true);
         //FighterSelectorUIObject.SetActive(true);
         NetworkManager.Singleton.StartClient();
-        ClientLoggedInServerRpc();
-    }
-
-    [ServerRpc]
-    public void ClientLoggedInServerRpc()
-    {
-        LobbySelectorUI lobbiesUI = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<LobbySelectorUI>();
-        lobbiesUI.OnClientJoin();
     }
 
     public string GetUsernameInput()

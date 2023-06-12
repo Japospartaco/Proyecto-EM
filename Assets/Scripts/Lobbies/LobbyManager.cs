@@ -18,11 +18,6 @@ public class LobbyManager : NetworkBehaviour
 
     public List<Lobby> Lobbies { get { return lobbies; } }
 
-    private void Start()
-    {
-        if (!IsServer) return;
-
-    }
 
     //METODO PARA CREAR UNA SALA SABIENDO EL ID DEL CREADOR
     public void CreateLobby(ulong creatorId)
@@ -44,7 +39,8 @@ public class LobbyManager : NetworkBehaviour
     public void AddPlayerToLobby(int indexInList, ulong playerId)
     {
         if (!IsServer) return;
-        lobbies[indexInList].AddPlayerToLobby(playerId);
+        if (!lobbies[indexInList].AddPlayerToLobby(playerId))
+            Debug.Log("NO SE PUDO AÑADIR JUGADOR");
     }
 
     //ELIMINAR LOBBY POR SU ID
@@ -53,5 +49,12 @@ public class LobbyManager : NetworkBehaviour
         if (!IsServer) return;
         lobbies.Remove(lobbies.Find(lobby => lobby.LobbyId == idLobby));
         LobbyEliminated?.Invoke(this, null);
+    }
+
+    public int GetPlayersLobby(ulong playerId)
+    {
+        if (!IsServer) return -1;
+
+        return onlinePlayers.ReturnPlayerInformation(playerId).CurrentLobbyId;
     }
 }

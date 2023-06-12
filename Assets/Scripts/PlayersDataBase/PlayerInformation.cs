@@ -9,6 +9,7 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private GameObject fighterObject;
     [SerializeField] private int currentLobbyId;
     [SerializeField] private int idInLobby;
+    [SerializeField] private int selectedFighter;
 
     public ulong Id
     {
@@ -37,15 +38,21 @@ public class PlayerInformation : MonoBehaviour
     public int IdInLobby
     {
         get { return idInLobby; }
-        set {idInLobby = value; }
+        set { idInLobby = value; }
+    }
+
+    public int SelectedFighter
+    {
+        get { return selectedFighter; }
+        set { selectedFighter = value; }
     }
 
     //METODO PARA INICILIZAR VALORES (SIMILAR A CONSTRUCTOR)
     public void InitializePlayer(ulong id, string username, GameObject fighterObject, int currentLobbyId, int idInLobby)
     {
         this.id = id;
-        this.username = username;   
-        this.fighterObject = fighterObject; 
+        this.username = username;
+        this.fighterObject = fighterObject;
         this.currentLobbyId = currentLobbyId;
         this.idInLobby = idInLobby;
     }

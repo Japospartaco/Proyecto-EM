@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using UnityEditor;
 using UnityEngine;
 
 public class Lobby
@@ -7,18 +9,29 @@ public class Lobby
     private List<PlayerInformation> playersInformation = new();
     private int lobbyId = -1;
     private const int MAX_PLAYERS = 4;
+    private List<ulong> readyPlayers = new();
 
     private OnlinePlayers onlinePlayers;
     private LobbyManager lobbyManager;
 
+    public List<PlayerInformation> PlayersList
+    {
+        get { return playersInformation; }
+    }
+
     public int LobbyId
     {
-        get { return this.lobbyId; }
+        get { return lobbyId; }
     }
 
     public int PlayersInLobby
     {
         get { return playersInformation.Count; }
+    }
+
+    public List<ulong> ReadyPlayers
+    {
+        get { return readyPlayers; }
     }
 
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
@@ -36,6 +49,12 @@ public class Lobby
     public bool AddPlayerToLobby(ulong playerId)
     {
         if (playersInformation.Count >= MAX_PLAYERS) return false;
+
+        foreach (var players in playersInformation)
+        {
+            if (players.Id == playerId)
+                return false;
+        }
 
         //ACTUALIZAR VALORES DE PLAYER INFORMATION
         PlayerInformation player = onlinePlayers.ReturnPlayerInformation(playerId);
@@ -60,5 +79,40 @@ public class Lobby
         playersInformation[player.IdInLobby].ResetAfterExitingLobby();
 
         playersInformation.RemoveAt(player.IdInLobby);
+    }
+
+    public void PlayerReady(ulong playerId)
+    {
+        foreach (var id in readyPlayers)
+        {
+            if (id == playerId)
+            {
+                readyPlayers.Remove(id);
+                return;
+            }
+        }
+
+        readyPlayers.Add(playerId);
+    }
+
+    public bool IsPlayerReady(ulong playerId)
+    {
+        foreach (var id in readyPlayers)
+        {
+            if (id == playerId)
+                return true;
+        }
+
+        return false;
+    }
+
+    public List<ulong> GetPlayersIdsList()
+    {
+        List<ulong> ids = new List<ulong>();
+        foreach(var player in playersInformation)
+        {
+            ids.Add(player.Id);
+        }
+        return ids;
     }
 }
