@@ -44,7 +44,13 @@ namespace Movement.Components
         void Update()
         {
             if (!IsOwner) return;
-            
+
+            UpdateServerRpc();
+        }
+
+        [ServerRpc]
+        public void UpdateServerRpc()
+        {
             _grounded = Physics2D.OverlapCircle(_feet.position, 0.1f, _floor);
             _animator.SetFloat(AnimatorSpeed, this._direction.magnitude);
             _animator.SetFloat(AnimatorVSpeed, this._rigidbody2D.velocity.y);
@@ -53,10 +59,23 @@ namespace Movement.Components
 
         void FixedUpdate()
         {
+            if(!IsOwner) return;
+            FixedUpdateServerRpc();
+        }
+
+        [ServerRpc]
+        public void FixedUpdateServerRpc()
+        {
             _rigidbody2D.velocity = new Vector2(_direction.x, _rigidbody2D.velocity.y);
         }
 
         public void Move(IMoveableReceiver.Direction direction)
+        {
+            ComputeMoveServerRpc(direction);
+        }
+
+        [ServerRpc]
+        public void ComputeMoveServerRpc(IMoveableReceiver.Direction direction)
         {
             if (direction == IMoveableReceiver.Direction.None)
             {
@@ -71,6 +90,12 @@ namespace Movement.Components
 
         public void Jump(IJumperReceiver.JumpStage stage)
         {
+            ComputeJumpServerRpc(stage);
+        }
+
+        [ServerRpc]
+        public void ComputeJumpServerRpc(IJumperReceiver.JumpStage stage)
+        {
             switch (stage)
             {
                 case IJumperReceiver.JumpStage.Jumping:
@@ -84,6 +109,7 @@ namespace Movement.Components
                     break;
             }
         }
+
 
         public void Attack1()
         {

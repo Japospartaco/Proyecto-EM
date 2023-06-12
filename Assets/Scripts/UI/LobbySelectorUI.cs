@@ -21,8 +21,6 @@ public class LobbySelectorUI : NetworkBehaviour
 
     private LobbyManager lobbyManager;
 
-
-
     private void Start()
     {
         lobbySelectorUIObject.SetActive(false);
@@ -38,6 +36,7 @@ public class LobbySelectorUI : NetworkBehaviour
         lobbyManager = GameObject.FindWithTag("Game Manager").GetComponent<LobbyManager>();
         if (lobbyManager == null) Debug.Log("LOBBY MANAGER NO ENCONTRAO");
     }
+
 
     public void OnRefreshButtonPressed()
     {
@@ -90,10 +89,10 @@ public class LobbySelectorUI : NetworkBehaviour
 
     public void OnCreateLobbyPressed()
     {
-
         CreateLobbyServerRpc(NetworkManager.LocalClientId);
         Debug.Log("CLIENTE: quiero crear sala");
-
+        lobbySelectorUIObject.SetActive(false);
+        fighterSelectorUIObject.SetActive(true);
     }
 
     public void Refresh()

@@ -20,10 +20,10 @@ public class LogInUI : MonoBehaviour
 
     public void OnLogInClicked()
     {
+        NetworkManager.Singleton.StartClient();
         LogInUIObject.SetActive(false);
         LobbySelectorUIObject.SetActive(true);
         //FighterSelectorUIObject.SetActive(true);
-        NetworkManager.Singleton.StartClient();
     }
 
     public string GetUsernameInput()
