@@ -57,4 +57,14 @@ public class LobbyManager : NetworkBehaviour
 
         return onlinePlayers.ReturnPlayerInformation(playerId).CurrentLobbyId;
     }
+
+    public Lobby GetLobbyFromId (int lobbyId)
+    {
+        foreach(var lob in lobbies)
+        {
+            if (lob.LobbyId == lobbyId)
+                return lob;
+        }
+        return null;
+    }
 }

@@ -12,14 +12,14 @@ public class FighterSelectorUI : NetworkBehaviour
     [SerializeField] private List<GameObject> beforeRefreshHiddenObjects;
 
     [SerializeField] private List<TMP_Text> playersText;
-    
+
     [SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject lobbySelectorUIObject;
 
     [SerializeField] private Button readyButton;
     [SerializeField] private Button refreshButton;
     [SerializeField] private Button returnButton;
-    
+
     [SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
     private OnlinePlayers onlinePlayers;
@@ -48,31 +48,54 @@ public class FighterSelectorUI : NetworkBehaviour
     public void OnReturnButtonPressed()
     {
         ulong clientId = NetworkManager.LocalClientId;
-        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
-        Lobby lobby = lobbyManager.Lobbies[lobbyId];
+        ReturnFromLobbyServerRpc(clientId);
 
-        lobby.RemovePlayerFromLobby(clientId);
+        lobbySelectorUIObject.SetActive(true);
+
+        foreach (var obj in beforeRefreshHiddenObjects)
+        {
+            obj.SetActive(false);
+        }
+        refreshButton.gameObject.SetActive(true);
 
         fighterSelectorUIObject.SetActive(false);
-        lobbySelectorUIObject.SetActive(true);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ReturnFromLobbyServerRpc(ulong clientId)
+    {
+        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        lobby.RemovePlayerFromLobby(clientId);
+        RefreshServerRpc(clientId, lobbyId);
     }
 
     //METODO PARA ACTUALIZAR INTERFAZ
     public void OnRefreshButtonPressed()
     {
-        RefreshServerRpc(NetworkManager.LocalClientId);
-        foreach(var obj in beforeRefreshHiddenObjects)
+        RefreshServerRpc(NetworkManager.LocalClientId, -1);
+        foreach (var obj in beforeRefreshHiddenObjects)
         {
             obj.SetActive(true);
         }
-        refreshButton.gameObject.SetActive(false);
+        //refreshButton.gameObject.SetActive(false);
     }
 
+    //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA
     [ServerRpc(RequireOwnership = false)]
-    public void RefreshServerRpc(ulong clientId)
+    public void RefreshServerRpc(ulong clientId, int playerLobbyId)
     {
-        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
-        Lobby myLobby = lobbyManager.Lobbies[lobbyId];
+        int lobbyId;
+        if (playerLobbyId != -1)
+        {
+            lobbyId = playerLobbyId;
+        }else
+        {
+            lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        }
+
+        Lobby myLobby = lobbyManager.GetLobbyFromId(lobbyId);
 
         for (int i = 0; i < myLobby.PlayersInLobby; i++)
         {
@@ -95,7 +118,6 @@ public class FighterSelectorUI : NetworkBehaviour
                     TargetClientIds = myLobby.GetPlayersIdsList()
                 }
             };
-
             RefreshClientRpc(i, text, clientRpcParams);
         }
     }
@@ -105,6 +127,11 @@ public class FighterSelectorUI : NetworkBehaviour
     public void RefreshClientRpc(int i, string text, ClientRpcParams clientRpcParams = default)
     {
         playersText[i].text = text;
+
+        for (int j = i+1; j < 4 ; j++)
+        {
+            playersText[j].text = "NONE";
+        }
     }
 
     // CUANDO EL JUGADOR ESTE LISTO PULSARA ESTE BOTON, Y SE HARA LA GESTION DE JUGADORES LISTOS PARA SPAWNEAR PERSONAJES Y EMPEZAR LA PARTIDA
@@ -119,7 +146,7 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         onlinePlayers.ReturnPlayerInformation(playerId).SelectedFighter = selectedFighter;
 
-        Lobby lobby = lobbyManager.Lobbies[lobbyManager.GetPlayersLobby(playerId)];
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyManager.GetPlayersLobby(playerId));
         lobby.PlayerReady(playerId);
 
         Debug.Log($"HAY {lobby.NumberOfReadyPlayers} JUGADORES LISTOS");

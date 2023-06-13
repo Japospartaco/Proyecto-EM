@@ -80,10 +80,12 @@ public class Lobby
             playersInformation[i].IdInLobby--;
         }
 
-        //PONER POR DEFECTO LOS VALORES DE LOBBY EN PLAYER INFORMATION
-        playersInformation[player.IdInLobby].ResetAfterExitingLobby();
-
         playersInformation.RemoveAt(player.IdInLobby);
+
+        //PONER POR DEFECTO LOS VALORES DE LOBBY EN PLAYER INFORMATION
+        player.ResetAfterExitingLobby();
+
+        Debug.Log($"ELIMINADO A {playerId}");
     }
 
     public void PlayerReady(ulong playerId)
