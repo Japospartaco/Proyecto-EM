@@ -6,8 +6,11 @@ using UnityEngine;
 
 public class Lobby
 {
-    private List<PlayerInformation> playersInformation = new();
     private int lobbyId = -1;
+    private bool isPrivate = false;
+    private bool isStarted = false;
+
+    private List<PlayerInformation> playersInformation = new();
     private const int MAX_PLAYERS = 4;
     private List<ulong> readyPlayers = new();
 
@@ -38,6 +41,18 @@ public class Lobby
     {
         get { return readyPlayers.Count; }
     }
+
+    public bool IsStarted
+    {
+        get { return isStarted; }
+        set { isStarted = value; }
+    }
+
+    public bool IsPrivate
+    {
+        get { return isPrivate; }
+    }
+
 
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
     {

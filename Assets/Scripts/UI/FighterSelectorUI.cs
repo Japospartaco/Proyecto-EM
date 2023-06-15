@@ -156,9 +156,11 @@ public class FighterSelectorUI : NetworkBehaviour
         if (lobby.PlayersInLobby == 1) return;
 
         if (lobby.NumberOfReadyPlayers >= (lobby.PlayersInLobby / 2) + 1)
-
+        {
+            lobby.IsStarted = true;
             //#################################### AQUI COMIENZA LA PARTIDA ##################################################
             StartGame(lobby);
+        }     
     }
 
 
