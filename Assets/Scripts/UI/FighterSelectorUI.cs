@@ -82,7 +82,7 @@ public class FighterSelectorUI : NetworkBehaviour
         //refreshButton.gameObject.SetActive(false);
     }
 
-    //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA
+    //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA  --- SI LE PASAS UN LOBBY CONCRETO LO HACE DE ESE LOBBY, SI NO, EL DEL USUARIO QUE LO ENVIA
     [ServerRpc(RequireOwnership = false)]
     public void RefreshServerRpc(ulong clientId, int playerLobbyId)
     {
@@ -150,6 +150,10 @@ public class FighterSelectorUI : NetworkBehaviour
         lobby.PlayerReady(playerId);
 
         Debug.Log($"HAY {lobby.NumberOfReadyPlayers} JUGADORES LISTOS");
+
+        RefreshServerRpc(playerId, -1);
+
+        if (lobby.PlayersInLobby == 1) return;
 
         if (lobby.NumberOfReadyPlayers >= (lobby.PlayersInLobby / 2) + 1)
 
