@@ -46,56 +46,45 @@ public class LobbySelectorUI : NetworkBehaviour
     public void OnJoin0Pressed()
     {
         AddClientToLobbyServerRpc(0, NetworkManager.LocalClientId);
+        lobbySelectorUIObject.SetActive(false);
+        fighterSelectorUIObject.SetActive(true);
+
     }
 
     public void OnJoin1Pressed()
     {
         AddClientToLobbyServerRpc(1, NetworkManager.LocalClientId);
+        lobbySelectorUIObject.SetActive(false);
+        fighterSelectorUIObject.SetActive(true);
 
     }
 
     public void OnJoin2Pressed()
     {
         AddClientToLobbyServerRpc(2, NetworkManager.LocalClientId);
+        lobbySelectorUIObject.SetActive(false);
+        fighterSelectorUIObject.SetActive(true);
+
     }
 
     public void OnJoin3Pressed()
     {
         AddClientToLobbyServerRpc(3, NetworkManager.LocalClientId);
+        lobbySelectorUIObject.SetActive(false);
+        fighterSelectorUIObject.SetActive(true);
+
     }
 
     //METODO QUE UNE A JUGADOR A SALA Y ACTUALIZA INTERFAZ DE TODOS
     [ServerRpc(RequireOwnership = false)]
     public void AddClientToLobbyServerRpc(int lobbyIndex, ulong clientId)
     {
-        if (lobbyManager.GetLobbyFromId(lobbyIndex).IsStarted) return;
-
-        if (lobbyManager.GetLobbyFromId(lobbyIndex).IsPrivate) return;
-        //AQUI SE IMPLEMENTARIA UN POP UP PARA ACCEDER A LA SALA O GESTION DE PARTIDAS PRIVADAS
-
         lobbyManager.AddPlayerToLobby(lobbyIndex, clientId);
-
-        ClientRpcParams clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[] { clientId }
-            }
-        };
-
-        ChangeToFighterSelectorCLientRpc(clientRpcParams);
 
         for (int i = 0; i < lobbyManager.Lobbies.Count; i++)
         {
             UpdateUIClientRpc(i, lobbyManager.Lobbies[i].LobbyId, lobbyManager.Lobbies[i].PlayersInLobby);
         }
-    }
-
-    [ClientRpc]
-    public void ChangeToFighterSelectorCLientRpc(ClientRpcParams clientRpcParams = default)
-    {
-        lobbySelectorUIObject.SetActive(false);
-        fighterSelectorUIObject.SetActive(true);
     }
 
     public void OnCreateLobbyPressed()
