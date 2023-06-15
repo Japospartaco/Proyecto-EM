@@ -7,16 +7,20 @@ namespace Netcode
     public class PlayerNetworkConfig : NetworkBehaviour
     {
         [SerializeField] private GameObject characterPrefab;
+        private OnlinePlayers onlinePlayers;
 
         public override void OnNetworkSpawn()
         {
             if (!IsOwner) return;
-            InstantiateCharacterServerRpc(OwnerClientId);
 
-            //string username = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<LogInUI>().GetUsernameInput();
-           // ulong id = OwnerClientId;
+            //#########BORRAR CUANDO SEA
+            //InstantiateCharacterServerRpc(OwnerClientId);
 
-            //NewClientServerRpc(username, id);
+            //OBTENEMOS EL "ID" DEL CLIENT Y EL "USERNAME" QUE HAYA ESCRITO POR PANTALLA
+            string username = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<LogInUI>().GetUsernameInput();
+            ulong id = OwnerClientId;
+
+            NewClientServerRpc(username, id);
         }
 
         [ServerRpc]
@@ -24,12 +28,15 @@ namespace Netcode
         {
             GameObject fighterObject = null;
             int currentLobbyId = -1;
+            int idInLobby = -1;
 
-            gameObject.GetComponent<PlayerInformation>().InitializePlayer(id, username, fighterObject, currentLobbyId);
+            //INICIALIZACION DE LOS VALORES DE SU  COMPONENTE "PLAYER INFROMATION"
+            gameObject.GetComponent<PlayerInformation>().InitializePlayer(id, username, fighterObject, currentLobbyId, idInLobby);
+            GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>().AddPlayer(id, gameObject);
         }
     
 
-
+        //LLAMADA ANTIGUA  ############ BORRAR CUANDO NO SEA NECESARIA
         [ServerRpc]
         public void InstantiateCharacterServerRpc(ulong id)
         {

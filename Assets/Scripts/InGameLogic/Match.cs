@@ -5,48 +5,60 @@ using Unity.Netcode;
 
 public class Match
 {
-    List<ulong> id_players;
-    OnlinePlayers onlinePlayers;
-    List<Round> roundList;
+    List<PlayerInformation> players;
+    List<Round> roundList = new List<Round>();
 
-    int idRoom;
+    int idLobby;
     int MAX_ROUNDS;
     int current_round;
     int time_per_round;
     
-    public Match(OnlinePlayers onlinePlayers, List<PlayerInformation> playerList, int n_rounds, int idRoom, int time_per_round)
+    public Match(Lobby lobby, int n_rounds, int time_per_round)
 	{
-        foreach(var player in playerList)
+        Debug.Log("He empezado la partida.");
+        idLobby = lobby.LobbyId;
+        players = lobby.PlayersList;
+
+        foreach (var player in players)
 		{
-            id_players.Add(player.Id);
+            Debug.Log($"Hola, soy {player.Username}");
 		}
 
-        this.onlinePlayers = onlinePlayers;
-
-        this.idRoom = idRoom;
         MAX_ROUNDS = n_rounds;
         this.time_per_round = time_per_round;
+
         current_round = 0;
 
+        StartRoundFromMatch();
     }
     
     void StartRoundFromMatch()
 	{
-        Round round = new Round(this, onlinePlayers, id_players, time_per_round);
-        roundList.Add(round);
+        Round round = new Round(this, players, time_per_round);
         round.StartRound();
-	}
+        roundList.Add(round);
+
+    }
 
     public void EndRound(Round round)
 	{
+        Debug.Log("Se ha terminado la ronda.");
         if (!round.Draw)
             current_round++;
+        else
+            Debug.Log($"Ronda {current_round} empatada.");
 
         if (current_round != MAX_ROUNDS)
+		{
             StartRoundFromMatch();
+            Debug.Log("Empezando siguiente ronda...");
+        }
         else
+		{
             PrintWinnersFromRounds();
-	}
+            Debug.Log("Fin de la partida.");
+        }
+    }
 
     void PrintWinnersFromRounds()
 	{
@@ -54,16 +66,25 @@ public class Match
         foreach(var round in roundList)
 		{
             i++;
-            string ussername = round.Winner.GetComponent<PlayerInformation>().Username;
-            PrintClientRpc(i, ussername);
+            string text;
+            if (round.Winner == null)
+			{
+                text = $"Ronda {i}, ha empatado.";
+            } else
+			{
+                string ussername = round.Winner.GetComponent<PlayerInformation>().Username;
+                text = $"Ronda {i}, ganador: {ussername}";
+            }
+
+            Debug.Log(text);
+            PrintClientRpc(text);
 		}
 	}
 
     [ClientRpc]
-    void PrintClientRpc(int n_ronda, string winner)
+    void PrintClientRpc(string text)
 	{
-        string text = $"Ronda {n_ronda}, ganador: {winner}";
-
+        
 	}
 
 }

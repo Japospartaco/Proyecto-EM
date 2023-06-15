@@ -11,6 +11,11 @@ namespace Fighting
         public Animator effectsPrefab;
         private static readonly int Hit03 = Animator.StringToHash("hit03");
         [SerializeField] private int dmg;
+        public int Dmg
+		{
+            get { return dmg; }
+            set { dmg = value; }
+		}
 
         private void OnCollisionEnter2D(Collision2D collision)
         {

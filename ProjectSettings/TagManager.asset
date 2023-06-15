@@ -5,8 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - UI Manager
+  - Game Manager
   - Clock
-  - Init Pos
+  - Spawn positions
   layers:
   - Default
   - TransparentFX

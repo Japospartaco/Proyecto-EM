@@ -2,16 +2,19 @@ using Movement.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Round
 {
     CountdownTimer timer;
 
-    //List<ulong> id_players;
-    List<GameObject> fighters;
-    List<GameObject> fighters_alive;
-    List<GameObject> fighters_dead;
+    List<PlayerInformation> players;
+
+    List<GameObject> fighters = new List<GameObject>();
+    List<GameObject> fighters_alive = new List<GameObject>();
+    List<GameObject> fighters_dead = new List<GameObject>();
+
     GameObject winner;
     bool draw;
 
@@ -27,25 +30,40 @@ public class Round
         get { return winner; }
     }
 
-    public Round(Match match, OnlinePlayers onlinePlayers, List<ulong> id_players, float time)
+    public Round(Match match, List<PlayerInformation> players, float time)
     {
+        Debug.Log("Ronda creada :D");
+        this.players = players;
 
-        //this.id_players = id_players;
-        fighters = onlinePlayers.GetFighterListFromIds(id_players);
+        //List<ulong> idPlayers = new();
+
+        foreach (var player in players)
+		{
+            Debug.Log($"{player.Username} ha seleccionado a {player.FighterObject}");
+            fighters.Add(player.FighterObject);
+            //idPlayers.Add(player.Id);
+		}
+
         timer = new CountdownTimer(time);
-        fighters_dead = new List<GameObject>();
-        fighters_alive = new List<GameObject>();
+
         timer.Alarm += EndRoundByTimer;
+
         draw = false;
         this.match = match;
 
-        GameObject initPos = GameObject.FindGameObjectWithTag("Init Pos");
+        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
+
 
         for (int i = 0; i < fighters.Count; i++)
 		{
-            fighters[i].transform.position = initPos.transform.GetChild(i).position;
+            Vector3 InitPos = initPos.transform.GetChild(i).position;
+
+            fighters[i].transform.position = InitPos;
+            //fighters[i].GetComponent<FighterMovement>().Move(IMoveableReceiver.Direction.Right);
 		}
+
     }
+
 
     public void StartRound()
     {
@@ -91,12 +109,13 @@ public class Round
 
     private void EndRoundByTimer(object sender, EventArgs e)
     {
+        Debug.Log("Se ha acabado la ronda por tiempo.");
         int ganadores = 0;
         int maxHp = 0;
 
-        foreach (var player in fighters)
+        foreach (var fighter in fighters)
         {
-            int currentHp = player.GetComponent<HealthManager>().healthPoints;
+            int currentHp = fighter.GetComponent<HealthManager>().healthPoints;
 
             if (currentHp > maxHp)
             {
@@ -104,13 +123,13 @@ public class Round
             }
         }
 
-        foreach (var player in fighters)
+        foreach (var fighter in fighters)
         {
-            int hp = player.GetComponent<HealthManager>().healthPoints;
+            int hp = fighter.GetComponent<HealthManager>().healthPoints;
 
             if (hp == maxHp)
             {
-                winner = player;
+                winner = fighter;
                 ganadores++;
             }
         }
@@ -159,7 +178,17 @@ public class Round
 
     }
 
-	private void RestoreAll()
+    private void PrepareForNextRound()
+	{
+        RestoreAll();
+        if (winner != null)
+		{
+            winner = winner.GetComponent<FighterInformation>().Player;
+		}
+        match.EndRound(this);
+    }
+
+    private void RestoreAll()
     {
         foreach (var player in fighters_alive)
         {
@@ -169,12 +198,6 @@ public class Round
         {
             player.GetComponent<FighterMovement>().Revive();
         }
-    }
-
-    private void PrepareForNextRound()
-	{
-        RestoreAll();
-        match.EndRound(this);
     }
 
 }
