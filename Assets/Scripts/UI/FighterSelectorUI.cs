@@ -67,7 +67,13 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             obj.SetActive(false);
         }
-        refreshButton.gameObject.SetActive(true);
+        timeSelectorInput.gameObject.SetActive(false);
+        roundNumberSelectorInput.gameObject.SetActive(false);
+
+        foreach(var text in playersText)
+        {
+            text.text = "NONE";
+        }
 
         fighterSelectorUIObject.SetActive(false);
     }
@@ -90,19 +96,27 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             obj.SetActive(true);
         }
-
-        //solo el jugador 1 puede modificar las opciones de rondas y tiempo
-        if (onlinePlayers.ReturnPlayerInformation(NetworkManager.LocalClientId).IdInLobby == 0)
-        {
-            roundNumberSelectorInput.gameObject.SetActive(true);
-            timeSelectorInput.gameObject.SetActive(true);
-        }
     }
 
     //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA  --- SI LE PASAS UN LOBBY CONCRETO LO HACE DE ESE LOBBY, SI NO, EL DEL USUARIO QUE LO ENVIA
     [ServerRpc(RequireOwnership = false)]
     public void RefreshServerRpc(ulong clientId, int playerLobbyId)
     {
+
+        //solo el jugador 1 puede modificar las opciones de rondas y tiempo
+        if (onlinePlayers.ReturnPlayerInformation(clientId).IdInLobby == 0)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            };
+            Player1RoundTimeOptionsClientRpc(clientRpcParams);
+        }
+
+
         int lobbyId;
         if (playerLobbyId != -1)
         {
@@ -150,6 +164,13 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             playersText[j].text = "NONE";
         }
+    }
+
+    [ClientRpc]
+    public void Player1RoundTimeOptionsClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        timeSelectorInput.gameObject.SetActive(true);
+        roundNumberSelectorInput.gameObject.SetActive(true);
     }
 
     // CUANDO EL JUGADOR ESTE LISTO PULSARA ESTE BOTON, Y SE HARA LA GESTION DE JUGADORES LISTOS PARA SPAWNEAR PERSONAJES Y EMPEZAR LA PARTIDA
