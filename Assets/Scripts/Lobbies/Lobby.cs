@@ -10,7 +10,7 @@ public class Lobby
     private bool isPrivate = false;
     private bool isStarted = false;
     private int roundNumber = 1;
-    private int roundTime = 30;
+    private int roundTime = 5;
 
 
     private List<PlayerInformation> playersInformation = new();

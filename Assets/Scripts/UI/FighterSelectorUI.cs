@@ -42,8 +42,8 @@ public class FighterSelectorUI : NetworkBehaviour
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
         returnButton.onClick.AddListener(OnReturnButtonPressed);
 
-        timeSelectorInput.onValueChanged.AddListener(OnTimeChanged);
-        roundNumberSelectorInput.onValueChanged.AddListener(OnRoundsChanged);
+        //timeSelectorInput.onValueChanged.AddListener(OnTimeChanged);
+        //roundNumberSelectorInput.onValueChanged.AddListener(OnRoundsChanged);
 
         onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
         lobbyManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<LobbyManager>();
@@ -212,10 +212,12 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             InstantiateCharacter(player.Id, player.SelectedFighter);
         }
-        int n_rounds = 2;
-        int time_per_round = 20;
+        int n_rounds = lobby.RoundNumber;
+        int time_per_round = lobby.RoundTime;
 
         Debug.Log("Quiero empezar la partida");
+        Debug.Log($"NUMERO DE RONDAS: {n_rounds}");
+        Debug.Log($"TIEMPO POR RONDA: {time_per_round}");
 
         StartGameClientRpc();
         Match partida = new Match(lobby, n_rounds, time_per_round);
@@ -244,29 +246,32 @@ public class FighterSelectorUI : NetworkBehaviour
 
     public void OnTimeChanged(int value)
     {
+        Debug.Log("CLIENTE CAMBIA TIEMPO: " + value);
         TimeChangedServerRpc(NetworkManager.LocalClientId ,timeOptions[value]);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void TimeChangedServerRpc(ulong clientId, int time)
     {
         int lobbyId = lobbyManager.GetPlayersLobby(clientId);
         Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
 
         lobby.RoundTime = time;
+        Debug.Log("SERVER ACTUALIZA TIEMPO: " +lobby.RoundTime);
     }
 
-    private void OnRoundsChanged(int value)
+    public void OnRoundsChanged(int value)
     {
         RoundsChangedServerRpc(NetworkManager.LocalClientId, timeOptions[value]);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void RoundsChangedServerRpc(ulong clientId, int rounds)
     {
         int lobbyId = lobbyManager.GetPlayersLobby(clientId);
         Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
 
         lobby.RoundNumber = rounds;
+        Debug.Log("SERVER ACTUALIZA RONDAS: " + lobby.RoundNumber);
     }
 }
