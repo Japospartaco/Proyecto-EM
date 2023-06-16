@@ -3,6 +3,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.Serialization;
 using Movement.Commands;
+using Unity.Netcode.Components;
 
 namespace Fighting
 {
@@ -28,7 +29,9 @@ namespace Fighting
 
             effect.transform.position = collision.GetContact(0).point;
             effect.GetComponent<NetworkObject>().Spawn();
-            effect.SetTrigger(Hit03);
+            effect.GetComponent<NetworkAnimator>().SetTrigger(Hit03);
+
+            //effect.SetTrigger(Hit03);
 
             // TODO: Review if this is the best way to do this
             IFighterReceiver enemy = otherObject.GetComponent<IFighterReceiver>();

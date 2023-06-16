@@ -53,7 +53,6 @@ public class Lobby
         get { return isPrivate; }
     }
 
-
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
     {
         //ACTUALIZAR VALORES EN PLAYER INFORMATION

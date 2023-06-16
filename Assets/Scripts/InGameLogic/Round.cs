@@ -8,6 +8,7 @@ using UnityEngine;
 public class Round
 {
     CountdownTimer timer;
+    ClientRpcParams clientRpcParams;
 
     List<PlayerInformation> players;
 
@@ -16,9 +17,23 @@ public class Round
     List<GameObject> fighters_dead = new List<GameObject>();
 
     GameObject winner;
-    bool draw;
 
     Match match;
+
+    bool draw;
+
+    float PRE_TIMER = 3.0f;
+    float time_per_round;
+
+    public CountdownTimer Timer
+	{
+        get { return timer; }
+	}
+
+    public ClientRpcParams ClientRpcParams
+	{
+        get { return clientRpcParams; }
+	}
 
     public bool Draw
 	{
@@ -30,43 +45,84 @@ public class Round
         get { return winner; }
     }
 
-    public Round(Match match, List<PlayerInformation> players, float time)
+    public Match Match
+	{
+        get { return match; }
+	}
+   
+
+    public Round(Match match, List<PlayerInformation> players, float time_per_round)
     {
         Debug.Log("Ronda creada :D");
         this.players = players;
 
-        //List<ulong> idPlayers = new();
+        List<ulong> idPlayers = new();
+        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
 
+        int contador = 0;
         foreach (var player in players)
 		{
-            Debug.Log($"{player.Username} ha seleccionado a {player.FighterObject}");
-            fighters.Add(player.FighterObject);
-            //idPlayers.Add(player.Id);
+            GameObject fighter = player.FighterObject;
+            Vector3 InitPos = initPos.transform.GetChild(contador).position;
+
+            fighter.transform.position = InitPos;
+            FighterMovement fighterMovement = fighter.GetComponent<FighterMovement>();
+
+            fighterMovement.AllowedMovement = false;
+
+            fighters.Add(fighter);
+            idPlayers.Add(player.Id);
+
+            contador++;
 		}
 
-        timer = new CountdownTimer(time);
 
-        timer.Alarm += EndRoundByTimer;
+        this.time_per_round = time_per_round;
+        timer = new CountdownTimer(PRE_TIMER, this);
+
+        timer.Alarm += RealStartRound;
 
         draw = false;
         this.match = match;
 
-        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
 
-
+        /*
         for (int i = 0; i < fighters.Count; i++)
 		{
-            Vector3 InitPos = initPos.transform.GetChild(i).position;
 
-            fighters[i].transform.position = InitPos;
-            //fighters[i].GetComponent<FighterMovement>().Move(IMoveableReceiver.Direction.Right);
-		}
+            fighters[i].GetComponent<FighterMovement>().Move(IMoveableReceiver.Direction.Right);
+		}*/
 
+
+        clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = idPlayers
+            }
+        };
+
+        StartRound();
     }
 
-
     public void StartRound()
+	{
+        timer.StartTimer();
+        Debug.Log("Preparando ronda.");
+	}
+
+    public void RealStartRound(object sender, EventArgs eventArgs)
     {
+        foreach(var player in fighters)
+		{
+            player.GetComponent<FighterMovement>().AllowedMovement = true;
+		}
+
+        timer.Timer = time_per_round;
+
+        timer.Alarm -= RealStartRound;
+        timer.Alarm += EndRoundByTimer;
+
         timer.StartTimer();
 
         foreach (var player in fighters)

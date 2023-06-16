@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 5011862488382498369}
   - component: {fileID: 5011862488382498368}
   - component: {fileID: 5011862488382498431}
-  - component: {fileID: 4162994330142735380}
-  - component: {fileID: 3928627885193544661}
+  - component: {fileID: 7146970948058443059}
+  - component: {fileID: 2513546772093149771}
   m_Layer: 0
   m_Name: Effects
   m_TagString: Untagged
@@ -107,7 +107,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &4162994330142735380
+--- !u!114 &7146970948058443059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -123,7 +123,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &3928627885193544661
+--- !u!114 &2513546772093149771
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

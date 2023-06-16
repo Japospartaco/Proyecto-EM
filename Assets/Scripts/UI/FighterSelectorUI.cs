@@ -13,15 +13,18 @@ public class FighterSelectorUI : NetworkBehaviour
 
     [SerializeField] private List<TMP_Text> playersText;
 
-    [SerializeField] private GameObject fighterSelectorUIObject;
+    [Space][SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject lobbySelectorUIObject;
+    [SerializeField] private GameObject matchUIObject;
 
-    [SerializeField] private Button readyButton;
+    [Space][SerializeField] private Button readyButton;
     [SerializeField] private Button refreshButton;
     [SerializeField] private Button returnButton;
 
-    [SerializeField] private TMP_Dropdown fighterSelectorInput;
+    [Space][SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
+
+    [Space] [SerializeField] private MatchManager matchManager;
     private OnlinePlayers onlinePlayers;
     private LobbyManager lobbyManager;
 
@@ -176,10 +179,8 @@ public class FighterSelectorUI : NetworkBehaviour
         int n_rounds = 2;
         int time_per_round = 20;
 
-        Debug.Log("Quiero empezar la partida");
-
         StartGameClientRpc();
-        Match partida = new Match(lobby, n_rounds, time_per_round);
+        matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager));
     }
 
 
@@ -201,5 +202,6 @@ public class FighterSelectorUI : NetworkBehaviour
     public void StartGameClientRpc()
     {
         fighterSelectorUIObject.SetActive(false);
+        matchUIObject.SetActive(true);
     }
 }

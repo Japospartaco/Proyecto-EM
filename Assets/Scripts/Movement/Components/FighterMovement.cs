@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 namespace Movement.Components
 {
-    [RequireComponent(typeof(Rigidbody2D)), 
+    [RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(Animator)),
      RequireComponent(typeof(NetworkObject))]
     public sealed class FighterMovement : NetworkBehaviour, IMoveableReceiver, IJumperReceiver, IFighterReceiver
@@ -22,7 +22,7 @@ namespace Movement.Components
 
         private Vector3 _direction = Vector3.zero;
         private bool _grounded = true;
-        
+
         private static readonly int AnimatorSpeed = Animator.StringToHash("speed");
         private static readonly int AnimatorVSpeed = Animator.StringToHash("vspeed");
         private static readonly int AnimatorGrounded = Animator.StringToHash("grounded");
@@ -30,6 +30,13 @@ namespace Movement.Components
         private static readonly int AnimatorAttack2 = Animator.StringToHash("attack2");
         private static readonly int AnimatorHit = Animator.StringToHash("hit");
         private static readonly int AnimatorDie = Animator.StringToHash("die");
+
+        bool allowedMovement = true;
+        public bool AllowedMovement
+		{
+            get { return allowedMovement; }
+            set { allowedMovement = value; }
+		}
 
         void Start()
         {
@@ -77,6 +84,7 @@ namespace Movement.Components
         [ServerRpc]
         public void ComputeMoveServerRpc(IMoveableReceiver.Direction direction)
         {
+            if (!allowedMovement) return;
             if (direction == IMoveableReceiver.Direction.None)
             {
                 this._direction = Vector3.zero;
