@@ -161,20 +161,28 @@ namespace Movement.Components
             if (!IsServer) return;
 
             _networkAnimator.SetTrigger(AnimatorDie);
-            DieEvent?.Invoke(this, gameObject);
         }
 
         public void DesactivateCharacter()
 		{
             gameObject.SetActive(false);
-		}
+            DieEvent?.Invoke(this, gameObject);
+        }
 
-        public void Revive()
+        public void Revive(ClientRpcParams clientRpcParams)
 		{
             //gameObject.SetActive(true);
             //Debug.Log(":D");
 
             gameObject.GetComponent<HealthManager>().Reset();
+            gameObject.SetActive(true);
+
+            ReviveClientRpc(clientRpcParams);
+        }
+
+        [ClientRpc]
+        void ReviveClientRpc(ClientRpcParams clientRpcParams = default)
+        {
             gameObject.SetActive(true);
         }
     }

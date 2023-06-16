@@ -1,4 +1,5 @@
 using Movement.Components;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Movement.Commands
@@ -12,8 +13,13 @@ namespace Movement.Commands
 
         public override void Execute()
         {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Execute(ClientRpcParams clientRpcParams)
+        {
             Debug.Log("Intentando acceder al comando revivir.");
-            Client.Revive();
+            Client.Revive(clientRpcParams);
         }
     }
 }

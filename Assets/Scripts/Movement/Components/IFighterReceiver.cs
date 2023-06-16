@@ -1,4 +1,6 @@
-﻿namespace Movement.Components
+﻿using Unity.Netcode;
+
+namespace Movement.Components
 {
     public interface IFighterReceiver : IRecevier
     {
@@ -6,6 +8,6 @@
         public void Attack2();
         public void TakeHit(int dmg);
         public void Die();
-        public void Revive();
+        public void Revive(ClientRpcParams clientRpcParams);
     }
 }

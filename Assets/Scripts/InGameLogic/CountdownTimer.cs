@@ -64,7 +64,4 @@ public class CountdownTimer
             Alarm?.Invoke(this, null);
         }
     }
-
-
-
 }

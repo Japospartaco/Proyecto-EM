@@ -57,7 +57,14 @@ public class Round
         Debug.Log("Ronda creada :D");
         this.players = players;
 
-        List<ulong> idPlayers = new();
+        clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = match.Lobby.GetPlayersIdsList()
+            }
+        };
+
         GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
 
         int contador = 0;
@@ -67,13 +74,13 @@ public class Round
             Vector3 InitPos = initPos.transform.GetChild(contador).position;
 
             fighter.transform.position = InitPos;
+
             FighterMovement fighterMovement = fighter.GetComponent<FighterMovement>();
 
             fighterMovement.AllowedMovement = false;
             fighterMovement.DieEvent += FighterDies;
 
             fighters.Add(fighter);
-            idPlayers.Add(player.Id);
 
             contador++;
 		}
@@ -86,23 +93,6 @@ public class Round
 
         draw = false;
         this.match = match;
-
-
-        /*
-        for (int i = 0; i < fighters.Count; i++)
-		{
-
-            fighters[i].GetComponent<FighterMovement>().Move(IMoveableReceiver.Direction.Right);
-		}*/
-
-
-        clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = idPlayers
-            }
-        };
 
         StartRound();
     }
@@ -185,7 +175,6 @@ public class Round
 	private void EndRoundByLastOne()
 	{
         Debug.Log("Se ha acabado la ronda por vidas.");
-        timer.Alarm -= EndRoundByTimer;
 
 		if (fighters_alive[0] != null)
 		{
@@ -204,11 +193,12 @@ public class Round
 		}
 
         PrepareForNextRound();
-
     }
 
     private void PrepareForNextRound()
 	{
+        timer.ResetTimer();
+
         RestoreAll();
         if (winner != null)
 		{
@@ -220,15 +210,18 @@ public class Round
 
     private void RestoreAll()
     {
+        foreach (var player in fighters)
+        {
+            player.GetComponent<FighterMovement>().DieEvent -= FighterDies;
+        }
+
         foreach (var player in fighters_alive)
         {
             player.GetComponent<HealthManager>().Reset();
         }
         foreach (var player in fighters_dead)
         {
-            Debug.Log($"Intentando resucitar a {player.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>().Username}");
-
-            new ReviveCommand(player.GetComponent<FighterMovement>()).Execute();
+            new ReviveCommand(player.GetComponent<FighterMovement>()).Execute(clientRpcParams);
         }
     }
 
