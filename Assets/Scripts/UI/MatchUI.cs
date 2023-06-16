@@ -28,14 +28,12 @@ public class MatchUI : NetworkBehaviour
     public void SuscribirTiempo(CountdownTimer countdownTimer)
 	{
         if (!IsServer) return;
-        Debug.Log("ESTOY EN SUSCRIBIR TIEMPO");
         countdownTimer.UpdateUITime += UpdateUITimer;
 	}
 
     public void UpdateUITimer(object sender, Match match)
 	{
         string text;
-        Debug.Log("He entrado a updateUiTimer");
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -47,13 +45,11 @@ public class MatchUI : NetworkBehaviour
 
         CountdownTimer countdownTimer = match.Playing_Round.Timer;
         float timer = countdownTimer.Timer;
-        Debug.Log(timer);
+
         int minutes = (int)timer / 60;
         int seconds = (int)timer % 60;
 
         text = setText(minutes, seconds);
-
-        Debug.Log(text);
 
         ActualizarTiempoClientRpc(text, clientRpcParams);
     }

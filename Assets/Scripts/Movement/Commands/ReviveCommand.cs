@@ -1,4 +1,5 @@
 using Movement.Components;
+using UnityEngine;
 
 namespace Movement.Commands
 {
@@ -11,6 +12,7 @@ namespace Movement.Commands
 
         public override void Execute()
         {
+            Debug.Log("Intentando acceder al comando revivir.");
             Client.Revive();
         }
     }

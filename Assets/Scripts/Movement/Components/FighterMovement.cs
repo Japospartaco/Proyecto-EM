@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -32,6 +33,9 @@ namespace Movement.Components
         private static readonly int AnimatorDie = Animator.StringToHash("die");
 
         bool allowedMovement = true;
+
+        public EventHandler<GameObject> DieEvent;
+
         public bool AllowedMovement
 		{
             get { return allowedMovement; }
@@ -145,6 +149,8 @@ namespace Movement.Components
 
         public void TakeHit(int dmg) //SOLO SE LLAMA DESDE WEAPON, Y SOLO ACCEDE EL SERVIDOR
         {
+            if (!IsServer) return;
+
             _networkAnimator.SetTrigger(AnimatorHit);
             gameObject.GetComponent<HealthManager>().TakeDmg(dmg);
         }
@@ -152,13 +158,10 @@ namespace Movement.Components
         public void Die()
         {
             //_networkAnimator.SetTrigger(AnimatorDie); 
-            ComputeDieServerRpc();
-        }
+            if (!IsServer) return;
 
-        [ServerRpc]
-        private void ComputeDieServerRpc()
-		{
-            _networkAnimator.SetTrigger(AnimatorDie); 
+            _networkAnimator.SetTrigger(AnimatorDie);
+            DieEvent?.Invoke(this, gameObject);
         }
 
         public void DesactivateCharacter()
@@ -169,12 +172,9 @@ namespace Movement.Components
         public void Revive()
 		{
             //gameObject.SetActive(true);
-            ComputeReviveServerRpc();
-        }
+            //Debug.Log(":D");
 
-        [ServerRpc]
-        private void ComputeReviveServerRpc()
-		{
+            gameObject.GetComponent<HealthManager>().Reset();
             gameObject.SetActive(true);
         }
     }

@@ -1,3 +1,4 @@
+using Movement.Commands;
 using Movement.Components;
 using System;
 using System.Collections;
@@ -69,6 +70,7 @@ public class Round
             FighterMovement fighterMovement = fighter.GetComponent<FighterMovement>();
 
             fighterMovement.AllowedMovement = false;
+            fighterMovement.DieEvent += FighterDies;
 
             fighters.Add(fighter);
             idPlayers.Add(player.Id);
@@ -131,38 +133,6 @@ public class Round
         }
     }
 
-    //public void CheckEndRound()
-    //{
-    //    bool endTimer = timer.Timer <= 0;
-    //    bool endAlives = fighters_alive.Count == 1;
-    //    int max_vit = 0;
-    //
-    //
-    //    if (endTimer || endAlives)
-    //    {
-    //        foreach (var player in fighters)
-    //        {
-    //            int hp = player.GetComponent<HealthManager>().vit;
-    //
-    //            if (hp > max_vit)
-    //            {
-    //                max_vit = hp;
-    //            }
-    //            if (hp <= 0)
-    //            {
-    //                fighters_dead.Add(player);
-    //                fighters_alive.Remove(player);
-    //            }
-    //        }
-    //
-    //        if (endTimer) EndRoundByTimer(max_vit);
-    //        if (endAlives) EndRoundByLastOne();
-    //        RestoreAll();
-    //    }
-    //
-    //}
-
-
     private void EndRoundByTimer(object sender, EventArgs e)
     {
         Debug.Log("Se ha acabado la ronda por tiempo.");
@@ -198,12 +168,12 @@ public class Round
         PrepareForNextRound();
     }
 
-    public void FighterDies(object sender, int idInLobby)
+    public void FighterDies(object sender, GameObject fighter)
     {
+        Debug.Log("Se ha muerto");
         //ESTA LINEA DESDE FIGHTER MOVEMENT
-        //int idInLobby = fighter.GetComponent<FighterInformation>().IdInLobby;
-        fighters_dead.Add(fighters[idInLobby]);
-        fighters_alive.Remove(fighters[idInLobby]);
+        if (fighters_alive.Remove(fighter))
+            fighters_dead.Add(fighter);
 
         if(fighters_alive.Count == 1)
         {
@@ -214,6 +184,9 @@ public class Round
 
 	private void EndRoundByLastOne()
 	{
+        Debug.Log("Se ha acabado la ronda por vidas.");
+        timer.Alarm -= EndRoundByTimer;
+
 		if (fighters_alive[0] != null)
 		{
 			if (fighters_alive[0].GetComponent<HealthManager>().healthPoints > 0)
@@ -241,6 +214,7 @@ public class Round
 		{
             winner = winner.GetComponent<FighterInformation>().Player;
 		}
+        Debug.Log($"Ganador de la ronda: {winner}");
         match.EndRound(this);
     }
 
@@ -252,7 +226,9 @@ public class Round
         }
         foreach (var player in fighters_dead)
         {
-            player.GetComponent<FighterMovement>().Revive();
+            Debug.Log($"Intentando resucitar a {player.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>().Username}");
+
+            new ReviveCommand(player.GetComponent<FighterMovement>()).Execute();
         }
     }
 
