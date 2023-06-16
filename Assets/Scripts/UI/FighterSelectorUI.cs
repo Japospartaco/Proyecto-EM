@@ -22,6 +22,14 @@ public class FighterSelectorUI : NetworkBehaviour
 
     [SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
+
+    [SerializeField] private TMP_Dropdown roundNumberSelectorInput;
+    [SerializeField] private int[] roundNumberOptions;
+
+    [SerializeField] private TMP_Dropdown timeSelectorInput;
+    [SerializeField] private int[] timeOptions;
+
+
     private OnlinePlayers onlinePlayers;
     private LobbyManager lobbyManager;
 
@@ -33,6 +41,9 @@ public class FighterSelectorUI : NetworkBehaviour
         readyButton.onClick.AddListener(OnReadyButtonPressed);
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
         returnButton.onClick.AddListener(OnReturnButtonPressed);
+
+        timeSelectorInput.onValueChanged.AddListener(OnTimeChanged);
+        roundNumberSelectorInput.onValueChanged.AddListener(OnRoundsChanged);
 
         onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
         lobbyManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<LobbyManager>();
@@ -79,7 +90,13 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             obj.SetActive(true);
         }
-        //refreshButton.gameObject.SetActive(false);
+
+        //solo el jugador 1 puede modificar las opciones de rondas y tiempo
+        if (onlinePlayers.ReturnPlayerInformation(NetworkManager.LocalClientId).IdInLobby == 0)
+        {
+            roundNumberSelectorInput.gameObject.SetActive(true);
+            timeSelectorInput.gameObject.SetActive(true);
+        }
     }
 
     //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA  --- SI LE PASAS UN LOBBY CONCRETO LO HACE DE ESE LOBBY, SI NO, EL DEL USUARIO QUE LO ENVIA
@@ -90,7 +107,8 @@ public class FighterSelectorUI : NetworkBehaviour
         if (playerLobbyId != -1)
         {
             lobbyId = playerLobbyId;
-        }else
+        }
+        else
         {
             lobbyId = lobbyManager.GetPlayersLobby(clientId);
         }
@@ -128,7 +146,7 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         playersText[i].text = text;
 
-        for (int j = i+1; j < 4 ; j++)
+        for (int j = i + 1; j < 4; j++)
         {
             playersText[j].text = "NONE";
         }
@@ -160,7 +178,7 @@ public class FighterSelectorUI : NetworkBehaviour
             lobby.IsStarted = true;
             //#################################### AQUI COMIENZA LA PARTIDA ##################################################
             StartGame(lobby);
-        }     
+        }
     }
 
 
@@ -192,5 +210,33 @@ public class FighterSelectorUI : NetworkBehaviour
     public void StartGameClientRpc()
     {
         fighterSelectorUIObject.SetActive(false);
+    }
+
+    public void OnTimeChanged(int value)
+    {
+        TimeChangedServerRpc(NetworkManager.LocalClientId ,timeOptions[value]);
+    }
+
+    [ServerRpc]
+    public void TimeChangedServerRpc(ulong clientId, int time)
+    {
+        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        lobby.RoundTime = time;
+    }
+
+    private void OnRoundsChanged(int value)
+    {
+        RoundsChangedServerRpc(NetworkManager.LocalClientId, timeOptions[value]);
+    }
+
+    [ServerRpc]
+    public void RoundsChangedServerRpc(ulong clientId, int rounds)
+    {
+        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        lobby.RoundNumber = rounds;
     }
 }

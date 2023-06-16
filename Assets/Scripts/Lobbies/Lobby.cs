@@ -9,6 +9,9 @@ public class Lobby
     private int lobbyId = -1;
     private bool isPrivate = false;
     private bool isStarted = false;
+    private int roundNumber = 1;
+    private int roundTime = 30;
+
 
     private List<PlayerInformation> playersInformation = new();
     private const int MAX_PLAYERS = 4;
@@ -51,6 +54,18 @@ public class Lobby
     public bool IsPrivate
     {
         get { return isPrivate; }
+    }
+
+    public int RoundNumber
+    {
+        get { return roundNumber;}
+        set { roundNumber = value; }
+    }
+
+    public int RoundTime
+    {
+        get { return roundTime; }
+        set { roundTime = value; }
     }
 
 
