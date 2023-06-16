@@ -6,18 +6,11 @@ using UnityEngine;
 //########### EN PRINCIPIO NO SE USA #############
 public class FighterInformation : MonoBehaviour
 {
-    private PlayerInformation playerInformation;
-    private int idInLobby;
+    [SerializeField] private GameObject player;
 
-    public PlayerInformation PlayerInformation
+    public GameObject Player
     {
-        get { return playerInformation; }
-        set { playerInformation = value; }
-    }
-
-    public int IdInLobby
-    {
-        get { return idInLobby; }
-        set { idInLobby = value; }
+        get { return player; }
+        set { player = value; }
     }
 }

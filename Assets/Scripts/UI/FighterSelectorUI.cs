@@ -186,11 +186,18 @@ public class FighterSelectorUI : NetworkBehaviour
     private void StartGame(Lobby lobby)
     {
         if (!IsServer) return;
+
         foreach (var player in lobby.PlayersList)
         {
             InstantiateCharacter(player.Id, player.SelectedFighter);
         }
+        int n_rounds = 2;
+        int time_per_round = 20;
+
+        Debug.Log("Quiero empezar la partida");
+
         StartGameClientRpc();
+        Match partida = new Match(lobby, n_rounds, time_per_round);
     }
 
 
@@ -200,7 +207,9 @@ public class FighterSelectorUI : NetworkBehaviour
         GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter]);
 
         //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUEÑO
-        onlinePlayers.ReturnPlayerInformation(id).FighterObject = characterGameObject;
+        GameObject player = onlinePlayers.ReturnPlayerGameObject(id);
+        player.GetComponent<PlayerInformation>().FighterObject = characterGameObject;
+        characterGameObject.GetComponent<FighterInformation>().Player = player;
 
         characterGameObject.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         characterGameObject.transform.SetParent(transform, false);
