@@ -13,16 +13,18 @@ public class FighterSelectorUI : NetworkBehaviour
 
     [SerializeField] private List<TMP_Text> playersText;
 
-    [SerializeField] private GameObject fighterSelectorUIObject;
+    [Space][SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject lobbySelectorUIObject;
+    [SerializeField] private GameObject matchUIObject;
 
-    [SerializeField] private Button readyButton;
+    [Space][SerializeField] private Button readyButton;
     [SerializeField] private Button refreshButton;
     [SerializeField] private Button returnButton;
 
-    [SerializeField] private TMP_Dropdown fighterSelectorInput;
+    [Space][SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
 
+    [Space] [SerializeField] private MatchManager matchManager;
     [SerializeField] private TMP_Dropdown roundNumberSelectorInput;
     [SerializeField] private int[] roundNumberOptions;
 
@@ -220,7 +222,7 @@ public class FighterSelectorUI : NetworkBehaviour
         Debug.Log($"TIEMPO POR RONDA: {time_per_round}");
 
         StartGameClientRpc();
-        Match partida = new Match(lobby, n_rounds, time_per_round);
+        matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager));
     }
 
 
@@ -229,7 +231,7 @@ public class FighterSelectorUI : NetworkBehaviour
         if (!IsServer) return;
         GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter]);
 
-        //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUEÑO
+        //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUEï¿½O
         GameObject player = onlinePlayers.ReturnPlayerGameObject(id);
         player.GetComponent<PlayerInformation>().FighterObject = characterGameObject;
         characterGameObject.GetComponent<FighterInformation>().Player = player;
@@ -242,6 +244,7 @@ public class FighterSelectorUI : NetworkBehaviour
     public void StartGameClientRpc()
     {
         fighterSelectorUIObject.SetActive(false);
+        matchUIObject.SetActive(true);
     }
 
     public void OnTimeChanged(int value)

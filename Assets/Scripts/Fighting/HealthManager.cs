@@ -17,7 +17,7 @@ public class HealthManager : MonoBehaviour
 
     //EVENTOS
     //public DmgEvent DmgTaken = new DmgEvent();
-    public EventHandler<bool> Dead;
+    //public EventHandler<bool> Dead;
     public EventHandler<int> DmgTaken;
 
     private void Start()
@@ -39,16 +39,14 @@ public class HealthManager : MonoBehaviour
     {
         healthPoints -= dmg;
         //DmgTaken?.Invoke(healthPoints);
-
+        Debug.Log("Me han pegado");
         if (healthPoints <= 0)
         {
+            Debug.Log("Me he muerto");
+            healthPoints = 0;
             new DieCommand(character).Execute();
-            Dead?.Invoke(this, false);
+            //Dead?.Invoke(this, false);
         }
     }
-
-
 }
-public class DmgEvent : UnityEvent<int>
-{
-}
+

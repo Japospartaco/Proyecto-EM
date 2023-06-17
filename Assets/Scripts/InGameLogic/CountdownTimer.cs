@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class CountdownTimer
@@ -9,17 +11,28 @@ public class CountdownTimer
     private float alarmTime;
     private bool started;
     public EventHandler Alarm;
+    public EventHandler<Match> UpdateUITime;
+
+    Round round;
 
     public float Timer
     {
         get { return timer; }
+        set { timer = value; }
     }
 
-    public CountdownTimer(float seconds)
+    public Round Round
+	{
+        get { return round; }
+	}
+
+    public CountdownTimer(float seconds, Round round)
     {
         this.alarmTime = seconds;
         this.timer = seconds;
-        GameObject.FindGameObjectWithTag("Clock").GetComponent<Clock>().ClockTick += UpdateTimer;
+        this.round = round;
+
+        GameObject.FindGameObjectWithTag("Clock").GetComponent<Clock>().ClockTick += UpdateTimer; 
     }
 
     public void StartTimer()
@@ -38,6 +51,8 @@ public class CountdownTimer
         if (!started) return;
 
         timer -= deltaTime;
+
+        UpdateUITime?.Invoke(this, round.Match);
         CheckAlarm();
     }
 

@@ -1,3 +1,4 @@
+using Movement.Commands;
 using Movement.Components;
 using System;
 using System.Collections;
@@ -8,6 +9,7 @@ using UnityEngine;
 public class Round
 {
     CountdownTimer timer;
+    ClientRpcParams clientRpcParams;
 
     List<PlayerInformation> players;
 
@@ -16,9 +18,23 @@ public class Round
     List<GameObject> fighters_dead = new List<GameObject>();
 
     GameObject winner;
-    bool draw;
 
     Match match;
+
+    bool draw;
+
+    float PRE_TIMER = 3.0f;
+    float time_per_round;
+
+    public CountdownTimer Timer
+	{
+        get { return timer; }
+	}
+
+    public ClientRpcParams ClientRpcParams
+	{
+        get { return clientRpcParams; }
+	}
 
     public bool Draw
 	{
@@ -30,43 +46,75 @@ public class Round
         get { return winner; }
     }
 
-    public Round(Match match, List<PlayerInformation> players, float time)
+    public Match Match
+	{
+        get { return match; }
+	}
+   
+
+    public Round(Match match, List<PlayerInformation> players, float time_per_round)
     {
         Debug.Log("Ronda creada :D");
         this.players = players;
 
-        //List<ulong> idPlayers = new();
+        clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = match.Lobby.GetPlayersIdsList()
+            }
+        };
 
+        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
+
+        int contador = 0;
         foreach (var player in players)
 		{
-            Debug.Log($"{player.Username} ha seleccionado a {player.FighterObject}");
-            fighters.Add(player.FighterObject);
-            //idPlayers.Add(player.Id);
+            GameObject fighter = player.FighterObject;
+            Vector3 InitPos = initPos.transform.GetChild(contador).position;
+
+            fighter.transform.position = InitPos;
+
+            FighterMovement fighterMovement = fighter.GetComponent<FighterMovement>();
+
+            fighterMovement.AllowedMovement = false;
+            fighterMovement.DieEvent += FighterDies;
+
+            fighters.Add(fighter);
+
+            contador++;
 		}
 
-        timer = new CountdownTimer(time);
 
-        timer.Alarm += EndRoundByTimer;
+        this.time_per_round = time_per_round;
+        timer = new CountdownTimer(PRE_TIMER, this);
+
+        timer.Alarm += RealStartRound;
 
         draw = false;
         this.match = match;
 
-        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
-
-
-        for (int i = 0; i < fighters.Count; i++)
-		{
-            Vector3 InitPos = initPos.transform.GetChild(i).position;
-
-            fighters[i].transform.position = InitPos;
-            //fighters[i].GetComponent<FighterMovement>().Move(IMoveableReceiver.Direction.Right);
-		}
-
+        StartRound();
     }
 
-
     public void StartRound()
+	{
+        timer.StartTimer();
+        Debug.Log("Preparando ronda.");
+	}
+
+    public void RealStartRound(object sender, EventArgs eventArgs)
     {
+        foreach(var player in fighters)
+		{
+            player.GetComponent<FighterMovement>().AllowedMovement = true;
+		}
+
+        timer.Timer = time_per_round;
+
+        timer.Alarm -= RealStartRound;
+        timer.Alarm += EndRoundByTimer;
+
         timer.StartTimer();
 
         foreach (var player in fighters)
@@ -74,38 +122,6 @@ public class Round
             fighters_alive.Add(player);
         }
     }
-
-    //public void CheckEndRound()
-    //{
-    //    bool endTimer = timer.Timer <= 0;
-    //    bool endAlives = fighters_alive.Count == 1;
-    //    int max_vit = 0;
-    //
-    //
-    //    if (endTimer || endAlives)
-    //    {
-    //        foreach (var player in fighters)
-    //        {
-    //            int hp = player.GetComponent<HealthManager>().vit;
-    //
-    //            if (hp > max_vit)
-    //            {
-    //                max_vit = hp;
-    //            }
-    //            if (hp <= 0)
-    //            {
-    //                fighters_dead.Add(player);
-    //                fighters_alive.Remove(player);
-    //            }
-    //        }
-    //
-    //        if (endTimer) EndRoundByTimer(max_vit);
-    //        if (endAlives) EndRoundByLastOne();
-    //        RestoreAll();
-    //    }
-    //
-    //}
-
 
     private void EndRoundByTimer(object sender, EventArgs e)
     {
@@ -142,12 +158,12 @@ public class Round
         PrepareForNextRound();
     }
 
-    public void FighterDies(object sender, int idInLobby)
+    public void FighterDies(object sender, GameObject fighter)
     {
+        Debug.Log("Se ha muerto");
         //ESTA LINEA DESDE FIGHTER MOVEMENT
-        //int idInLobby = fighter.GetComponent<FighterInformation>().IdInLobby;
-        fighters_dead.Add(fighters[idInLobby]);
-        fighters_alive.Remove(fighters[idInLobby]);
+        if (fighters_alive.Remove(fighter))
+            fighters_dead.Add(fighter);
 
         if(fighters_alive.Count == 1)
         {
@@ -158,6 +174,8 @@ public class Round
 
 	private void EndRoundByLastOne()
 	{
+        Debug.Log("Se ha acabado la ronda por vidas.");
+
 		if (fighters_alive[0] != null)
 		{
 			if (fighters_alive[0].GetComponent<HealthManager>().healthPoints > 0)
@@ -175,28 +193,35 @@ public class Round
 		}
 
         PrepareForNextRound();
-
     }
 
     private void PrepareForNextRound()
 	{
+        timer.ResetTimer();
+
         RestoreAll();
         if (winner != null)
 		{
             winner = winner.GetComponent<FighterInformation>().Player;
 		}
+        Debug.Log($"Ganador de la ronda: {winner}");
         match.EndRound(this);
     }
 
     private void RestoreAll()
     {
+        foreach (var player in fighters)
+        {
+            player.GetComponent<FighterMovement>().DieEvent -= FighterDies;
+        }
+
         foreach (var player in fighters_alive)
         {
             player.GetComponent<HealthManager>().Reset();
         }
         foreach (var player in fighters_dead)
         {
-            player.GetComponent<FighterMovement>().Revive();
+            new ReviveCommand(player.GetComponent<FighterMovement>()).Execute(clientRpcParams);
         }
     }
 

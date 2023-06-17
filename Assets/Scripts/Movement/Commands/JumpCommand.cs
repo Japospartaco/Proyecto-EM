@@ -1,4 +1,5 @@
 ﻿using Movement.Components;
+using Unity.Netcode;
 
 namespace Movement.Commands
 {
@@ -11,6 +12,11 @@ namespace Movement.Commands
         public override void Execute()
         {
             ((IJumperReceiver)Client).Jump(IJumperReceiver.JumpStage.Jumping);
+        }
+
+        public override void Execute(ClientRpcParams client)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

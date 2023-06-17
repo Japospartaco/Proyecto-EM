@@ -1,4 +1,5 @@
 ﻿using Movement.Components;
+using Unity.Netcode;
 
 namespace Movement.Commands
 {
@@ -11,6 +12,11 @@ namespace Movement.Commands
         public override void Execute()
         {
             Client.Attack2();
+        }
+
+        public override void Execute(ClientRpcParams clientRpcParams)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

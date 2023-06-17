@@ -1,4 +1,5 @@
 ﻿using Movement.Components;
+using Unity.Netcode;
 
 namespace Movement.Commands
 {
@@ -13,5 +14,7 @@ namespace Movement.Commands
         }
 
         public abstract void Execute();
+
+        public abstract void Execute(ClientRpcParams client);
     }
 }

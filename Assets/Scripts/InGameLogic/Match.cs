@@ -2,30 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
 
 public class Match
 {
+    Lobby lobby;
     List<PlayerInformation> players;
     List<Round> roundList = new List<Round>();
+    Round playing_round;
+
+
+    MatchManager matchManager;
 
     int idLobby;
     int MAX_ROUNDS;
     int current_round;
     int time_per_round;
+
+    public Lobby Lobby
+	{
+		get { return lobby; }
+	}
+
+    public List<PlayerInformation> Players
+	{
+        get { return players; }
+        set { players = value; }
+	}
+
+    public Round Playing_Round
+    {
+        get { return playing_round; }
+    }
+
+    public int IdLobby
+	{
+        get { return idLobby; }
+        set { idLobby = value; }
+	}
+
     
-    public Match(Lobby lobby, int n_rounds, int time_per_round)
+    public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager)
 	{
         Debug.Log("He empezado la partida.");
         idLobby = lobby.LobbyId;
         players = lobby.PlayersList;
-
-        foreach (var player in players)
-		{
-            Debug.Log($"Hola, soy {player.Username}");
-		}
+        this.lobby = lobby;
 
         MAX_ROUNDS = n_rounds;
         this.time_per_round = time_per_round;
+        this.matchManager = matchManager;
 
         current_round = 0;
 
@@ -35,9 +61,12 @@ public class Match
     void StartRoundFromMatch()
 	{
         Round round = new Round(this, players, time_per_round);
-        round.StartRound();
-        roundList.Add(round);
 
+        playing_round = round;
+        matchManager.AddEventMatch(playing_round.Timer);
+        playing_round.StartRound();
+
+        roundList.Add(playing_round);
     }
 
     public void EndRound(Round round)

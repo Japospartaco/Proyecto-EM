@@ -88,7 +88,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectsPrefab: {fileID: 5011862488382498431, guid: ccf5b78470c35b9449a921ee0e3c17e9, type: 3}
-  dmg: 35
+  dmg: 200
 --- !u!1 &2268116844751448805
 GameObject:
   m_ObjectHideFlags: 0
@@ -408,6 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aa9d7f7bf859024d8e9590cc8046778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
 --- !u!1 &3010630682471395148
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,4 +528,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectsPrefab: {fileID: 5011862488382498431, guid: ccf5b78470c35b9449a921ee0e3c17e9, type: 3}
-  dmg: 32
+  dmg: 200

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -6,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace Movement.Components
 {
-    [RequireComponent(typeof(Rigidbody2D)), 
+    [RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(Animator)),
      RequireComponent(typeof(NetworkObject))]
     public sealed class FighterMovement : NetworkBehaviour, IMoveableReceiver, IJumperReceiver, IFighterReceiver
@@ -22,7 +23,7 @@ namespace Movement.Components
 
         private Vector3 _direction = Vector3.zero;
         private bool _grounded = true;
-        
+
         private static readonly int AnimatorSpeed = Animator.StringToHash("speed");
         private static readonly int AnimatorVSpeed = Animator.StringToHash("vspeed");
         private static readonly int AnimatorGrounded = Animator.StringToHash("grounded");
@@ -30,6 +31,16 @@ namespace Movement.Components
         private static readonly int AnimatorAttack2 = Animator.StringToHash("attack2");
         private static readonly int AnimatorHit = Animator.StringToHash("hit");
         private static readonly int AnimatorDie = Animator.StringToHash("die");
+
+        bool allowedMovement = true;
+
+        public EventHandler<GameObject> DieEvent;
+
+        public bool AllowedMovement
+		{
+            get { return allowedMovement; }
+            set { allowedMovement = value; }
+		}
 
         void Start()
         {
@@ -77,6 +88,7 @@ namespace Movement.Components
         [ServerRpc]
         public void ComputeMoveServerRpc(IMoveableReceiver.Direction direction)
         {
+            if (!allowedMovement) return;
             if (direction == IMoveableReceiver.Direction.None)
             {
                 this._direction = Vector3.zero;
@@ -137,6 +149,8 @@ namespace Movement.Components
 
         public void TakeHit(int dmg) //SOLO SE LLAMA DESDE WEAPON, Y SOLO ACCEDE EL SERVIDOR
         {
+            if (!IsServer) return;
+
             _networkAnimator.SetTrigger(AnimatorHit);
             gameObject.GetComponent<HealthManager>().TakeDmg(dmg);
         }
@@ -144,29 +158,31 @@ namespace Movement.Components
         public void Die()
         {
             //_networkAnimator.SetTrigger(AnimatorDie); 
-            ComputeDieServerRpc();
-        }
+            if (!IsServer) return;
 
-        [ServerRpc]
-        private void ComputeDieServerRpc()
-		{
-            _networkAnimator.SetTrigger(AnimatorDie); 
+            _networkAnimator.SetTrigger(AnimatorDie);
         }
 
         public void DesactivateCharacter()
 		{
             gameObject.SetActive(false);
-		}
-
-        public void Revive()
-		{
-            //gameObject.SetActive(true);
-            ComputeReviveServerRpc();
+            DieEvent?.Invoke(this, gameObject);
         }
 
-        [ServerRpc]
-        private void ComputeReviveServerRpc()
+        public void Revive(ClientRpcParams clientRpcParams)
 		{
+            //gameObject.SetActive(true);
+            //Debug.Log(":D");
+
+            gameObject.GetComponent<HealthManager>().Reset();
+            gameObject.SetActive(true);
+
+            ReviveClientRpc(clientRpcParams);
+        }
+
+        [ClientRpc]
+        void ReviveClientRpc(ClientRpcParams clientRpcParams = default)
+        {
             gameObject.SetActive(true);
         }
     }

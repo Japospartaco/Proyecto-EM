@@ -9,6 +9,7 @@ TagManager:
   - Clock
   - Spawn positions
   - cambios de marco
+  - Canvas
   layers:
   - Default
   - TransparentFX

@@ -15,4 +15,4 @@ public class Clock : NetworkBehaviour
         //EVENTO PARA ACTUALIZAR RELOJES SUSCRITOS
         ClockTick?.Invoke(this, Time.deltaTime);
     }
-}
+}//
