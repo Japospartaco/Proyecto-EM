@@ -262,12 +262,14 @@ public class FighterSelectorUI : NetworkBehaviour
 
     public void OnRoundsChanged(int value)
     {
-        RoundsChangedServerRpc(NetworkManager.LocalClientId, timeOptions[value]);
+        Debug.Log("CLIENTE CAMBIA RONDA: " + value);
+        RoundsChangedServerRpc(NetworkManager.LocalClientId, roundNumberOptions[value]);
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void RoundsChangedServerRpc(ulong clientId, int rounds)
     {
+        Debug.Log("SERVER INTENTA ACTUALIZAR RONDAS");
         int lobbyId = lobbyManager.GetPlayersLobby(clientId);
         Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
 
