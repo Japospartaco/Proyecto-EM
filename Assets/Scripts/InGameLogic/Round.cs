@@ -9,7 +9,6 @@ using UnityEngine;
 public class Round
 {
     CountdownTimer timer;
-    ClientRpcParams clientRpcParams;
 
     List<PlayerInformation> players;
 
@@ -27,19 +26,14 @@ public class Round
     float time_per_round;
 
     public CountdownTimer Timer
-	{
+    {
         get { return timer; }
-	}
-
-    public ClientRpcParams ClientRpcParams
-	{
-        get { return clientRpcParams; }
-	}
+    }
 
     public bool Draw
-	{
+    {
         get { return draw; }
-	}
+    }
 
     public GameObject Winner
     {
@@ -47,29 +41,21 @@ public class Round
     }
 
     public Match Match
-	{
+    {
         get { return match; }
-	}
-   
+    }
+
 
     public Round(Match match, List<PlayerInformation> players, float time_per_round)
     {
         Debug.Log("Ronda creada :D");
         this.players = players;
 
-        clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = match.Lobby.GetPlayersIdsList()
-            }
-        };
-
         GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
 
         int contador = 0;
         foreach (var player in players)
-		{
+        {
             GameObject fighter = player.FighterObject;
             Vector3 InitPos = initPos.transform.GetChild(contador).position;
 
@@ -83,7 +69,7 @@ public class Round
             fighters.Add(fighter);
 
             contador++;
-		}
+        }
 
 
         this.time_per_round = time_per_round;
@@ -93,22 +79,20 @@ public class Round
 
         draw = false;
         this.match = match;
-
-        StartRound();
     }
 
     public void StartRound()
-	{
+    {
         timer.StartTimer();
         Debug.Log("Preparando ronda.");
-	}
+    }
 
     public void RealStartRound(object sender, EventArgs eventArgs)
     {
-        foreach(var player in fighters)
-		{
+        foreach (var player in fighters)
+        {
             player.GetComponent<FighterMovement>().AllowedMovement = true;
-		}
+        }
 
         timer.Timer = time_per_round;
 
@@ -145,11 +129,24 @@ public class Round
 
             if (hp == maxHp)
             {
-                winner = fighter;
                 ganadores++;
             }
         }
-        if (ganadores > 1)
+
+        if (ganadores == 1)
+        {
+            foreach (var fighter in fighters)
+            {
+                int hp = fighter.GetComponent<HealthManager>().healthPoints;
+
+                if (hp == maxHp)
+                {
+                    winner = fighter;
+                    winner.GetComponent<FighterInformation>().WinnedRounds += 1;
+                }
+            }
+        }
+        else
         {
             winner = null;
             draw = true;
@@ -158,6 +155,8 @@ public class Round
         PrepareForNextRound();
     }
 
+
+
     public void FighterDies(object sender, GameObject fighter)
     {
         Debug.Log("Se ha muerto");
@@ -165,45 +164,46 @@ public class Round
         if (fighters_alive.Remove(fighter))
             fighters_dead.Add(fighter);
 
-        if(fighters_alive.Count == 1)
+        if (fighters_alive.Count == 1)
         {
             EndRoundByLastOne();
-		}
-	}
+        }
+    }
 
 
-	private void EndRoundByLastOne()
-	{
+    private void EndRoundByLastOne()
+    {
         Debug.Log("Se ha acabado la ronda por vidas.");
 
-		if (fighters_alive[0] != null)
-		{
-			if (fighters_alive[0].GetComponent<HealthManager>().healthPoints > 0)
-			{
-				winner = fighters_alive[0];
-			}
-			else
-			{
-				//ESTA MUERTO
-			}
-		}
-		else
-		{
-			//ES NULL
-		}
+        if (fighters_alive[0] != null)
+        {
+            if (fighters_alive[0].GetComponent<HealthManager>().healthPoints > 0)
+            {
+                winner = fighters_alive[0];
+                winner.GetComponent<FighterInformation>().WinnedRounds += 1;
+            }
+            else
+            {
+                //ESTA MUERTO
+            }
+        }
+        else
+        {
+            //ES NULL
+        }
 
         PrepareForNextRound();
     }
 
     private void PrepareForNextRound()
-	{
+    {
         timer.ResetTimer();
 
         RestoreAll();
         if (winner != null)
-		{
+        {
             winner = winner.GetComponent<FighterInformation>().Player;
-		}
+        }
         Debug.Log($"Ganador de la ronda: {winner}");
         match.EndRound(this);
     }
@@ -221,6 +221,14 @@ public class Round
         }
         foreach (var player in fighters_dead)
         {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = match.Lobby.GetPlayersIdsList()
+                }
+            };
+
             new ReviveCommand(player.GetComponent<FighterMovement>()).Execute(clientRpcParams);
         }
     }

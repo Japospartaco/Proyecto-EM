@@ -7,7 +7,10 @@ using System;
 public class Match
 {
     Lobby lobby;
+    ClientRpcParams clientRpcParams;
+
     List<PlayerInformation> players;
+    PlayerInformation player_winner;
     List<Round> roundList = new List<Round>();
     Round playing_round;
 
@@ -19,10 +22,9 @@ public class Match
     int current_round;
     int time_per_round;
 
-    public Lobby Lobby
-	{
-		get { return lobby; }
-	}
+    public EventHandler<Match> EndMatchEvent;
+
+    public Lobby Lobby { get { return lobby; } }
 
     public List<PlayerInformation> Players
 	{
@@ -30,10 +32,15 @@ public class Match
         set { players = value; }
 	}
 
-    public Round Playing_Round
+    public PlayerInformation Player_Winner
     {
-        get { return playing_round; }
+        get { return player_winner; }
+        set { player_winner = value; }
     }
+
+    public Round Playing_Round { get { return playing_round; } }
+
+    public MatchManager MatchManager { get { return matchManager; } }
 
     public int IdLobby
 	{
@@ -42,11 +49,14 @@ public class Match
 	}
 
     
+
+
     public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager)
 	{
         Debug.Log("He empezado la partida.");
         idLobby = lobby.LobbyId;
-        players = lobby.PlayersList;
+        players = lobby.PlayersList;    
+
         this.lobby = lobby;
 
         MAX_ROUNDS = n_rounds;
@@ -55,15 +65,16 @@ public class Match
 
         current_round = 0;
 
+
         StartRoundFromMatch();
     }
-    
+
     void StartRoundFromMatch()
 	{
         Round round = new Round(this, players, time_per_round);
 
         playing_round = round;
-        matchManager.AddEventMatch(playing_round.Timer);
+        matchManager.AddEventTimerMatch(playing_round.Timer);
         playing_round.StartRound();
 
         roundList.Add(playing_round);
@@ -84,36 +95,50 @@ public class Match
         }
         else
 		{
-            PrintWinnersFromRounds();
-            Debug.Log("Fin de la partida.");
+            EndMatch();
         }
     }
 
-    void PrintWinnersFromRounds()
-	{
-        int i = 0;
-        foreach(var round in roundList)
-		{
-            i++;
-            string text;
-            if (round.Winner == null)
-			{
-                text = $"Ronda {i}, ha empatado.";
-            } else
-			{
-                string ussername = round.Winner.GetComponent<PlayerInformation>().Username;
-                text = $"Ronda {i}, ganador: {ussername}";
-            }
+    public void EndMatch()
+    {
+        player_winner = GetPlayerWinner();
+        matchManager.AddEventEndMatch(this);
 
-            Debug.Log(text);
-            PrintClientRpc(text);
-		}
-	}
-
-    [ClientRpc]
-    void PrintClientRpc(string text)
-	{
         
+        EndMatchEvent?.Invoke(this, this);
+
+        Debug.Log("Fin de la partida.");
+    }
+
+    PlayerInformation GetPlayerWinner()
+	{
+        PlayerInformation winner = null;
+
+        int max_ganadas = 0;
+
+        foreach(var player in players)
+        {
+            FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
+            int ganadas = fighterInformation.WinnedRounds;
+
+            if (max_ganadas < ganadas)
+            {
+                max_ganadas = ganadas;
+            }
+        }
+
+        foreach (var player in players)
+        {
+            FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
+            int ganadas = fighterInformation.WinnedRounds;
+
+            if (max_ganadas == ganadas)
+            {
+                winner = player;
+            }
+        }
+
+        return winner;
 	}
 
 }

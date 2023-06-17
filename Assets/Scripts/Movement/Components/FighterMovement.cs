@@ -165,7 +165,11 @@ namespace Movement.Components
 
         public void DesactivateCharacter()
 		{
+            Debug.Log("Desactivando al cliente");
             gameObject.SetActive(false);
+
+            if (!IsServer) return;
+            Debug.Log("Llamando al evento de morir");
             DieEvent?.Invoke(this, gameObject);
         }
 

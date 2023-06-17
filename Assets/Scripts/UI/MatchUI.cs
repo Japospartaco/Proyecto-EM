@@ -7,6 +7,10 @@ using UnityEngine;
 
 public class MatchUI : NetworkBehaviour
 {
+    [SerializeField] GameObject matchUI;
+    [SerializeField] GameObject postMatchUI;
+    PostMatchUI postMatchUIScript;
+
     [SerializeField] MatchManager matchManager;
 
     [SerializeField] private TMP_Text textBoxTimer;
@@ -16,7 +20,8 @@ public class MatchUI : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        matchUI.SetActive(false);
+        postMatchUIScript = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<PostMatchUI>();
     }
 
     // Update is called once per frame
@@ -27,13 +32,18 @@ public class MatchUI : NetworkBehaviour
 
     public void SuscribirTiempo(CountdownTimer countdownTimer)
 	{
-        if (!IsServer) return;
         countdownTimer.UpdateUITime += UpdateUITimer;
 	}
+
+    public void SuscribirFinPartida(Match match)
+    {
+        match.EndMatchEvent += UpdateEndUI;
+    }
 
     public void UpdateUITimer(object sender, Match match)
 	{
         string text;
+        Debug.Log("Estoy en UpdateUITimer");
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -75,14 +85,39 @@ public class MatchUI : NetworkBehaviour
         return text;
     }
 
+
     [ClientRpc]
     private void ActualizarTiempoClientRpc(string text, ClientRpcParams clientRpcParams = default)
     {
+        Debug.Log("CLIENTE RPC: Estoy en actualizar tiempo cliente rpc");
         textBoxTimer.text = $"{text}";
     }
 
+    public void UpdateEndUI(object sender, Match match)
+    {
+        Debug.Log("Estoy en UpdateEndUI");
 
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = match.Lobby.GetPlayersIdsList()
+            }
+        };
 
+        UpdateEndUIClientRpc(clientRpcParams);
+
+        postMatchUIScript.ShowResult(match);
+        matchManager.Destroy(match);
+    }
+
+    [ClientRpc]
+    void UpdateEndUIClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        Debug.Log("CLIENTE RPC: Cambiando UI partida a UI post partida");
+        matchUI.SetActive(false);
+        postMatchUI.SetActive(true);
+    }
 
 
 

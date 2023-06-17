@@ -176,7 +176,7 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             InstantiateCharacter(player.Id, player.SelectedFighter);
         }
-        int n_rounds = 2;
+        int n_rounds = 1;
         int time_per_round = 20;
 
         StartGameClientRpc();
