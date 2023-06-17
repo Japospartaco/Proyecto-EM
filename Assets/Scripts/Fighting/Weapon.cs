@@ -26,12 +26,10 @@ namespace Fighting
             // Debug.Log($"Sword collision with {otherObject.name}");
 
             Animator effect = Instantiate(effectsPrefab);
-
             effect.transform.position = collision.GetContact(0).point;
+         
             effect.GetComponent<NetworkObject>().Spawn();
             effect.GetComponent<NetworkAnimator>().SetTrigger(Hit03);
-
-            //effect.SetTrigger(Hit03);
 
             // TODO: Review if this is the best way to do this
             IFighterReceiver enemy = otherObject.GetComponent<IFighterReceiver>();
