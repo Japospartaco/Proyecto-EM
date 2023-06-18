@@ -6,10 +6,10 @@ using UnityEngine.Serialization;
 
 namespace Movement.Components
 {
-    [RequireComponent(typeof(Rigidbody2D)), 
+    [RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(Animator)),
      RequireComponent(typeof(NetworkObject))]
-    public sealed class FighterMovement : NetworkBehaviour, IMoveableReceiver, IJumperReceiver, IFighterReceiver
+    public sealed class FighterMovement : NetworkBehaviour, IMoveableReceiver, IJumperReceiver, IFighterReceiver, IDashReceiver
     {
         public float speed = 1.0f;
         public float jumpAmount = 1.0f;
@@ -22,7 +22,8 @@ namespace Movement.Components
 
         private Vector3 _direction = Vector3.zero;
         private bool _grounded = true;
-        
+        private bool dashed = false;
+
         private static readonly int AnimatorSpeed = Animator.StringToHash("speed");
         private static readonly int AnimatorVSpeed = Animator.StringToHash("vspeed");
         private static readonly int AnimatorGrounded = Animator.StringToHash("grounded");
@@ -51,7 +52,18 @@ namespace Movement.Components
         [ServerRpc]
         public void UpdateServerRpc()
         {
+            
             _grounded = Physics2D.OverlapCircle(_feet.position, 0.1f, _floor);
+            if (_grounded)
+            {
+                dashed=false;
+            }
+            
+            if (_rigidbody2D.velocity.magnitude > 90)
+            {
+                dashed = true;
+            }
+
             _animator.SetFloat(AnimatorSpeed, this._direction.magnitude);
             _animator.SetFloat(AnimatorVSpeed, this._rigidbody2D.velocity.y);
             _animator.SetBool(AnimatorGrounded, this._grounded);
@@ -59,7 +71,7 @@ namespace Movement.Components
 
         void FixedUpdate()
         {
-            if(!IsOwner) return;
+            if (!IsOwner) return;
             FixedUpdateServerRpc();
         }
 
@@ -67,6 +79,7 @@ namespace Movement.Components
         public void FixedUpdateServerRpc()
         {
             _rigidbody2D.velocity = new Vector2(_direction.x, _rigidbody2D.velocity.y);
+            
         }
 
         public void Move(IMoveableReceiver.Direction direction)
@@ -79,6 +92,7 @@ namespace Movement.Components
         {
             if (direction == IMoveableReceiver.Direction.None)
             {
+
                 this._direction = Vector3.zero;
                 return;
             }
@@ -86,6 +100,32 @@ namespace Movement.Components
             bool lookingRight = direction == IMoveableReceiver.Direction.Right;
             _direction = (lookingRight ? 1f : -1f) * speed * Vector3.right;
             transform.localScale = new Vector3(lookingRight ? 1 : -1, 1, 1);
+        }
+
+        public void Dash(IDashReceiver.Stage stage)
+        {
+            ComputeDashServerRpc(stage);
+
+        }
+
+        [ServerRpc]
+        public void ComputeDashServerRpc(IDashReceiver.Stage stage)
+        {
+            switch (stage)
+            {
+                case IDashReceiver.Stage.Dashed:
+                    if (!_grounded && !dashed)
+                    {
+                        float dashForce = 100.0f;
+                        Vector2 forceDirection = new Vector2(transform.localScale.x, 0f).normalized;
+                        Vector2 dashForceVector = forceDirection * dashForce;
+                        _rigidbody2D.AddForce(dashForceVector, ForceMode2D.Impulse);
+                        //dashed = true;
+                    }
+                    break;
+                case IDashReceiver.Stage.Posible:
+                    break;
+            }
         }
 
         public void Jump(IJumperReceiver.JumpStage stage)
@@ -109,8 +149,32 @@ namespace Movement.Components
                     break;
             }
         }
+        /// <summary>
 
 
+        /// </summary>
+        /*
+       public void Dash(IDashReceiver.Direction direction)
+       {
+           ComputeDashServerRpc(direction);
+       }
+
+       [ServerRpc]
+       public void ComputeDashServerRpc(IDashReceiver.Direction direction)
+       {
+           if (_grounded)
+           {
+               if (direction == IDashReceiver.Direction.None)
+               {
+                   //this._direction = Vector3.zero;
+                   return;
+               }
+
+               bool lookingRight = direction == IDashReceiver.Direction.Right;
+               _direction = (lookingRight ? 1f : -1f) * (speed * 3.0f) * Vector3.right;
+               transform.localScale = new Vector3(lookingRight ? 1 : -1, 1, 1);
+           }
+       }*/
         public void Attack1()
         {
             //_networkAnimator.SetTrigger(AnimatorAttack1);
@@ -119,7 +183,7 @@ namespace Movement.Components
 
         [ServerRpc]
         private void ComputeAttack1ServerRpc()
-		{
+        {
             _networkAnimator.SetTrigger(AnimatorAttack1);
         }
 
@@ -131,7 +195,7 @@ namespace Movement.Components
 
         [ServerRpc]
         private void ComputeAttack2ServerRpc()
-		{
+        {
             _networkAnimator.SetTrigger(AnimatorAttack2);
         }
 
@@ -149,25 +213,27 @@ namespace Movement.Components
 
         [ServerRpc]
         private void ComputeDieServerRpc()
-		{
-            _networkAnimator.SetTrigger(AnimatorDie); 
+        {
+            _networkAnimator.SetTrigger(AnimatorDie);
         }
 
         public void DesactivateCharacter()
-		{
+        {
             gameObject.SetActive(false);
-		}
+        }
 
         public void Revive()
-		{
+        {
             //gameObject.SetActive(true);
             ComputeReviveServerRpc();
         }
 
         [ServerRpc]
         private void ComputeReviveServerRpc()
-		{
+        {
             gameObject.SetActive(true);
         }
+
+
     }
 }

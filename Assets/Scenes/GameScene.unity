@@ -22025,6 +22025,26 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_Id
+      value: fce07a8c-bac9-4de0-a738-e18b0dbf3304
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_Name
+      value: Dash
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_Interactions
+      value: Press(pressPoint=0.01,behavior=2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_ExpectedControlType
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
       propertyPath: Attack1.m_SingletonActionBindings.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -22033,12 +22053,72 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 61043bec-d8eb-4ac6-9476-eaa5be034c11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[1].m_Id
+      value: dca18db0-b896-4409-8ca2-0765c79e983f
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[2].m_Id
+      value: 8c9ae1ba-7ec3-4011-8fdd-78a665c0624a
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[0].m_Name
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/q
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[1].m_Name
+      value: negative
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[1].m_Path
+      value: <Keyboard>/q
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[2].m_Name
+      value: positive
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[2].m_Path
+      value: <Keyboard>/e
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
       propertyPath: Attack1.m_SingletonActionBindings.Array.data[1].m_Id
       value: 0cd15b1a-110a-4c91-b464-6c87c7c19ff7
       objectReference: {fileID: 0}
     - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
       propertyPath: Attack2.m_SingletonActionBindings.Array.data[1].m_Id
       value: 014f2f39-1820-4aea-a462-b7a2d2d36c39
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[0].m_Flags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[1].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[2].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Dash
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Dash
+      objectReference: {fileID: 0}
+    - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
+      propertyPath: Dash.m_SingletonActionBindings.Array.data[2].m_Action
+      value: Dash
       objectReference: {fileID: 0}
     - target: {fileID: 7909192859141269002, guid: cb181b31953c5db4fbbee5399d4b73e8, type: 3}
       propertyPath: Attack1.m_SingletonActionBindings.Array.data[1].m_Path
