@@ -10,6 +10,9 @@ public class Lobby
     private int lobbyId = -1;
     private bool isPrivate = false;
     private bool isStarted = false;
+    private int roundNumber = 1;
+    private int roundTime = 5;
+
 
     private List<PlayerInformation> playersInformation = new();
     private const int MAX_PLAYERS = 4;
@@ -53,6 +56,19 @@ public class Lobby
     {
         get { return isPrivate; }
     }
+
+    public int RoundNumber
+    {
+        get { return roundNumber;}
+        set { roundNumber = value; }
+    }
+
+    public int RoundTime
+    {
+        get { return roundTime; }
+        set { roundTime = value; }
+    }
+
 
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
     {
@@ -158,9 +174,17 @@ public class Lobby
         return ids;
     }
 
-    public void ResetPlayerReady()
+    public void RemoveAllPlayers()
     {
-        Debug.Log("Adios a todos los players");
+
+        while (playersInformation.Count > 0)
+        {
+            RemovePlayerFromLobby(playersInformation[0].Id);
+        }
+
         readyPlayers.Clear();
+
+        isStarted = false;
+        isPrivate = false;
     }
 }

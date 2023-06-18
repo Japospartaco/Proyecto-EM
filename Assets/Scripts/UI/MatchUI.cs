@@ -107,8 +107,7 @@ public class MatchUI : NetworkBehaviour
 
         UpdateEndUIClientRpc(clientRpcParams);
 
-        postMatchUIScript.ShowResult(match);
-        matchManager.Destroy(match);
+        postMatchUIScript.ComputeInterfaces(match);
     }
 
     [ClientRpc]

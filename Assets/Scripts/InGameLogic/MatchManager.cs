@@ -55,6 +55,8 @@ public class MatchManager : NetworkBehaviour
 
     public void Destroy(Match match)
     {
+        Debug.Log("Destruyendo la partida.");
+
         Match desiredToDestroy = ReturnMatch(match);
 
         foreach(var player in desiredToDestroy.Players)

@@ -21,6 +21,8 @@ public class LobbySelectorUI : NetworkBehaviour
 
     private LobbyManager lobbyManager;
 
+    private FighterSelectorUI fighterSelector;
+
     private void Start()
     {
         lobbySelectorUIObject.SetActive(false);
@@ -35,6 +37,8 @@ public class LobbySelectorUI : NetworkBehaviour
 
         lobbyManager = GameObject.FindWithTag("Game Manager").GetComponent<LobbyManager>();
         if (lobbyManager == null) Debug.Log("LOBBY MANAGER NO ENCONTRAO");
+
+        fighterSelector = GetComponent<FighterSelectorUI>();
     }
 
 
@@ -83,7 +87,8 @@ public class LobbySelectorUI : NetworkBehaviour
             }
         };
 
-        ChangeToFighterSelectorCLientRpc(clientRpcParams);
+        ChangeToFighterSelectorCLientRpc(lobbyIndex, clientRpcParams);
+
 
         for (int i = 0; i < lobbyManager.Lobbies.Count; i++)
         {
@@ -92,10 +97,13 @@ public class LobbySelectorUI : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void ChangeToFighterSelectorCLientRpc(ClientRpcParams clientRpcParams = default)
+    public void ChangeToFighterSelectorCLientRpc(int lobbyIndex, ClientRpcParams clientRpcParams = default)
     {
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
+
+        fighterSelector.RefreshServerRpc(NetworkManager.LocalClientId, lobbyIndex);
+        
     }
 
     public void OnCreateLobbyPressed()

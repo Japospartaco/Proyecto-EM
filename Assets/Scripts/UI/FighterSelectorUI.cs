@@ -25,6 +25,13 @@ public class FighterSelectorUI : NetworkBehaviour
     [SerializeField] private List<GameObject> fightersPrefab;
 
     [Space] [SerializeField] private MatchManager matchManager;
+    [SerializeField] private TMP_Dropdown roundNumberSelectorInput;
+    [SerializeField] private int[] roundNumberOptions;
+
+    [SerializeField] private TMP_Dropdown timeSelectorInput;
+    [SerializeField] private int[] timeOptions;
+
+
     private OnlinePlayers onlinePlayers;
     private LobbyManager lobbyManager;
 
@@ -36,6 +43,9 @@ public class FighterSelectorUI : NetworkBehaviour
         readyButton.onClick.AddListener(OnReadyButtonPressed);
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
         returnButton.onClick.AddListener(OnReturnButtonPressed);
+
+        //timeSelectorInput.onValueChanged.AddListener(OnTimeChanged);
+        //roundNumberSelectorInput.onValueChanged.AddListener(OnRoundsChanged);
 
         onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
         lobbyManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<LobbyManager>();
@@ -59,7 +69,13 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             obj.SetActive(false);
         }
-        refreshButton.gameObject.SetActive(true);
+        timeSelectorInput.gameObject.SetActive(false);
+        roundNumberSelectorInput.gameObject.SetActive(false);
+
+        foreach(var text in playersText)
+        {
+            text.text = "NONE";
+        }
 
         fighterSelectorUIObject.SetActive(false);
     }
@@ -82,18 +98,41 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             obj.SetActive(true);
         }
-        //refreshButton.gameObject.SetActive(false);
+    }
+
+    public void OcultarHiddenObjects()
+    {
+        foreach (var obj in beforeRefreshHiddenObjects)
+        {
+            obj.SetActive(false);
+        }
     }
 
     //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA  --- SI LE PASAS UN LOBBY CONCRETO LO HACE DE ESE LOBBY, SI NO, EL DEL USUARIO QUE LO ENVIA
     [ServerRpc(RequireOwnership = false)]
     public void RefreshServerRpc(ulong clientId, int playerLobbyId)
     {
+
+        //solo el jugador 1 puede modificar las opciones de rondas y tiempo
+        if (onlinePlayers.ReturnPlayerInformation(clientId).IdInLobby == 0)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            };
+            Player1RoundTimeOptionsClientRpc(clientRpcParams);
+        }
+
+
         int lobbyId;
         if (playerLobbyId != -1)
         {
             lobbyId = playerLobbyId;
-        }else
+        }
+        else
         {
             lobbyId = lobbyManager.GetPlayersLobby(clientId);
         }
@@ -132,10 +171,17 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         playersText[i].text = text;
 
-        for (int j = i+1; j < 4 ; j++)
+        for (int j = i + 1; j < 4; j++)
         {
             playersText[j].text = "NONE";
         }
+    }
+
+    [ClientRpc]
+    public void Player1RoundTimeOptionsClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        timeSelectorInput.gameObject.SetActive(true);
+        roundNumberSelectorInput.gameObject.SetActive(true);
     }
 
     // CUANDO EL JUGADOR ESTE LISTO PULSARA ESTE BOTON, Y SE HARA LA GESTION DE JUGADORES LISTOS PARA SPAWNEAR PERSONAJES Y EMPEZAR LA PARTIDA
@@ -164,7 +210,7 @@ public class FighterSelectorUI : NetworkBehaviour
             lobby.IsStarted = true;
             //#################################### AQUI COMIENZA LA PARTIDA ##################################################
             StartGame(lobby);
-        }     
+        }
     }
 
 
@@ -177,9 +223,12 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             InstantiateCharacter(player.Id, player.SelectedFighter);
         }
+        int n_rounds = lobby.RoundNumber;
+        int time_per_round = lobby.RoundTime;
 
-        int n_rounds = 1;
-        int time_per_round = 20;
+        Debug.Log("Quiero empezar la partida");
+        Debug.Log($"NUMERO DE RONDAS: {n_rounds}");
+        Debug.Log($"TIEMPO POR RONDA: {time_per_round}");
 
         StartGameClientRpc();
         matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager));
@@ -191,7 +240,7 @@ public class FighterSelectorUI : NetworkBehaviour
         if (!IsServer) return;
         GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter]);
 
-        //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUEÑO
+        //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUEï¿½O
         GameObject player = onlinePlayers.ReturnPlayerGameObject(id);
         player.GetComponent<PlayerInformation>().FighterObject = characterGameObject;
         characterGameObject.GetComponent<FighterInformation>().Player = player;
@@ -205,5 +254,38 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         fighterSelectorUIObject.SetActive(false);
         matchUIObject.SetActive(true);
+    }
+
+    public void OnTimeChanged(int value)
+    {
+        Debug.Log("CLIENTE CAMBIA TIEMPO: " + value);
+        TimeChangedServerRpc(NetworkManager.LocalClientId ,timeOptions[value]);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void TimeChangedServerRpc(ulong clientId, int time)
+    {
+        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        lobby.RoundTime = time;
+        Debug.Log("SERVER ACTUALIZA TIEMPO: " +lobby.RoundTime);
+    }
+
+    public void OnRoundsChanged(int value)
+    {
+        Debug.Log("CLIENTE CAMBIA RONDA: " + value);
+        RoundsChangedServerRpc(NetworkManager.LocalClientId, roundNumberOptions[value]);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RoundsChangedServerRpc(ulong clientId, int rounds)
+    {
+        Debug.Log("SERVER INTENTA ACTUALIZAR RONDAS");
+        int lobbyId = lobbyManager.GetPlayersLobby(clientId);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        lobby.RoundNumber = rounds;
+        Debug.Log("SERVER ACTUALIZA RONDAS: " + lobby.RoundNumber);
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - Game Manager
   - Clock
   - Spawn positions
+  - cambios de marco
   - Canvas
   layers:
   - Default

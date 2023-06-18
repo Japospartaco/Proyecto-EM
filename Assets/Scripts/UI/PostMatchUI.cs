@@ -7,14 +7,14 @@ using UnityEngine.UI;
 
 public class PostMatchUI : NetworkBehaviour
 {
+
     [Space]
     [SerializeField] GameObject matchUI;
     [SerializeField] GameObject postMatchUI;
-    [SerializeField] GameObject fighterSelectorUI;
+    [SerializeField] GameObject lobbySelectorUI;
 
     [Space]
     [SerializeField] List<GameObject> playersUI;
-    [SerializeField] GameObject winnerUI;
 
     [Space]
     [SerializeField] List<Sprite> fighters_sprite;
@@ -32,7 +32,10 @@ public class PostMatchUI : NetworkBehaviour
     [Space]
     [SerializeField] OnlinePlayers onlinePlayers;
     [SerializeField] LobbyManager lobbyManager;
+    [SerializeField] MatchManager matchManager;
+    //[SerializeField] MatchManager match;
 
+    private LobbySelectorUI lobbySelector;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +43,8 @@ public class PostMatchUI : NetworkBehaviour
         postMatchUI.SetActive(false);
 
         buttonVolverAJugar.onClick.AddListener(OnButtonPressedVolverAJugar);
+
+        lobbySelector = GetComponent<LobbySelectorUI>();
     }
 
 
@@ -48,8 +53,14 @@ public class PostMatchUI : NetworkBehaviour
     {
 
     }
+    public void ComputeInterfaces(Match match)
+    {
+        ShowResult(match);
+        matchManager.Destroy(match);
+        RemoveAllPlayersFromLobby(match);
+    }
 
-    public void ShowResult(Match match)
+    void ShowResult(Match match)
     {
         Debug.Log("Soy servidor");
         List<PlayerInformation> jugadores = match.Players;
@@ -76,6 +87,13 @@ public class PostMatchUI : NetworkBehaviour
         }
     }
 
+    public void RemoveAllPlayersFromLobby(Match match)
+    {
+        Lobby lobby = match.Lobby;
+        lobby.RemoveAllPlayers();
+    }
+
+
     [ClientRpc]
     void MostrarInterfazJugadoresClientRpc(int index, int selectedFighter, string text, int winnerSelectedFighter, string textWinner, ClientRpcParams clientRpcParams = default)
     {
@@ -94,31 +112,36 @@ public class PostMatchUI : NetworkBehaviour
         Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER A JUGAR");
         ulong id = NetworkManager.LocalClientId;
         ComputeOnButtonPressedServerRpc(id);
+
+        lobbySelector.RefreshServerRpc(id);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void ComputeOnButtonPressedServerRpc(ulong id)
+    void ComputeOnButtonPressedServerRpc(ulong clientId)
     {
         Debug.Log("SERVIDOR: HE PRESIONADO EL BOTON");
-        GameObject player = onlinePlayers.ReturnPlayerGameObject(id);
-        
-        int lobbyId = player.GetComponent<PlayerInformation>().CurrentLobbyId;
-        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
-        lobby.ResetPlayerReady();
 
-   
-        ReturnSelectorClientRpc(id);
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientId }
+            }
+        };
 
-        fighterSelectorUI.GetComponent<FighterSelectorUI>().RefreshServerRpc(id, -1);
+        ReturnSelectorClientRpc(clientRpcParams);
+
     }
 
     [ClientRpc]
-    public void ReturnSelectorClientRpc(ulong id)
+    public void ReturnSelectorClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        if (NetworkManager.LocalClientId != id) return;
         Debug.Log("CLIENTE: ME VOY A LA FIGHTER SELECTION");
 
         postMatchUI.SetActive(false);
-        fighterSelectorUI.SetActive(true);
+
+        lobbySelectorUI.SetActive(true);
+
+        GetComponent<FighterSelectorUI>().OcultarHiddenObjects();
     }
 }
