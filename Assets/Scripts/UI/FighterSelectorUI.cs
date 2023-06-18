@@ -230,7 +230,16 @@ public class FighterSelectorUI : NetworkBehaviour
         Debug.Log($"NUMERO DE RONDAS: {n_rounds}");
         Debug.Log($"TIEMPO POR RONDA: {time_per_round}");
 
-        StartGameClientRpc();
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobby.GetPlayersIdsList()
+            }
+        };
+
+        StartGameClientRpc(clientRpcParams);
+        
         matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager));
     }
 
@@ -245,12 +254,14 @@ public class FighterSelectorUI : NetworkBehaviour
         player.GetComponent<PlayerInformation>().FighterObject = characterGameObject;
         characterGameObject.GetComponent<FighterInformation>().Player = player;
 
+        matchManager.AddEventHealthInterface(characterGameObject.GetComponent<HealthManager>());
+
         characterGameObject.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         characterGameObject.transform.SetParent(transform, false);
     }
 
     [ClientRpc]
-    public void StartGameClientRpc()
+    public void StartGameClientRpc(ClientRpcParams clientRpcParams = default)
     {
         fighterSelectorUIObject.SetActive(false);
         matchUIObject.SetActive(true);

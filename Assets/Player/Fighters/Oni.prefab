@@ -466,8 +466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4ad354313418184db0c9fb8fdd5876c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthPoints: 100
-  maxHealth: 100
+  healthPoints: 70
+  maxHealth: 70
   character: {fileID: 0}
   playerIdInRoom: 0
 --- !u!114 &4197632210011462285
@@ -483,6 +483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  winnedRounds: 0
 --- !u!1 &8174797378138190224
 GameObject:
   m_ObjectHideFlags: 0

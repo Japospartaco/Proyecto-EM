@@ -78,6 +78,7 @@ public class Round
         timer.Alarm += RealStartRound;
 
         draw = false;
+
         this.match = match;
     }
 

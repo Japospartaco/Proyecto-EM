@@ -4,16 +4,27 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MatchUI : NetworkBehaviour
 {
+    [Space]
     [SerializeField] GameObject matchUI;
     [SerializeField] GameObject postMatchUI;
     PostMatchUI postMatchUIScript;
 
-    [SerializeField] MatchManager matchManager;
-
+    [Space]
     [SerializeField] private TMP_Text textBoxTimer;
+    [SerializeField] List<GameObject> playerContainerList;
+    [SerializeField] List<Image> playerImageList;
+    [SerializeField] List<TMP_Text> playerUsernameList;
+    [SerializeField] List<TMP_Text> playerHealthList;
+
+    [Space]
+    [SerializeField] List<Sprite> fighterIcons;
+
+    [Space]
+    [SerializeField] LobbyManager lobbyManager;
 
     public EventHandler UpdateUITime;
 
@@ -21,7 +32,7 @@ public class MatchUI : NetworkBehaviour
     void Start()
     {
         matchUI.SetActive(false);
-        postMatchUIScript = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<PostMatchUI>();
+        postMatchUIScript = GetComponent<PostMatchUI>();
     }
 
     // Update is called once per frame
@@ -30,20 +41,103 @@ public class MatchUI : NetworkBehaviour
         
     }
 
+    public void SuscribirInicializarUIHealth(Match match)
+    {
+        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de inicializar ui de health.");
+        match.StartMatch += InitializeUIHealth;
+    }
+
+    public void SuscribirInterfazVidas(HealthManager healthManager)
+    {
+        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de vidas.");
+        healthManager.DmgTaken += UpdateUIHealth;
+    }
+
     public void SuscribirTiempo(CountdownTimer countdownTimer)
 	{
-        countdownTimer.UpdateUITime += UpdateUITimer;
+        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de tiempo.");
+        countdownTimer.UpdateUITimeEvent += UpdateUITimer;
 	}
 
     public void SuscribirFinPartida(Match match)
     {
+        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de fin de partida.");
         match.EndMatchEvent += UpdateEndUI;
+    }
+    
+    public void InitializeUIHealth(object sender, Match match)
+    {
+        Debug.Log("He llegado a inicializar UI Health"); // Llego aqui
+        List<PlayerInformation> listPlayers = match.Lobby.PlayersList;
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = match.Lobby.GetPlayersIdsList()
+            }
+        };
+
+        for (int i = 0; i < listPlayers.Count; i++) {
+
+            PlayerInformation player = listPlayers[i];
+            HealthManager healthManager = player.FighterObject.GetComponent<HealthManager>();
+
+            string user = player.Username;
+            string health = $"{healthManager.healthPoints}/{healthManager.maxHealth}";
+            int selectedFighter = player.SelectedFighter;
+
+            InitializeUIHealthClientRpc(i, user, health, selectedFighter, clientRpcParams);
+        }
+
+    }
+
+    [ClientRpc]
+    void InitializeUIHealthClientRpc(int index, string user, string health, int selectedFighter, ClientRpcParams clientRpcParams = default)
+    {
+        playerContainerList[index].SetActive(true);
+        playerImageList[index].sprite = fighterIcons[selectedFighter];
+        playerUsernameList[index].text = user;
+        playerHealthList[index].text = health;
+    }
+
+    public void UpdateUIHealth(object sender, GameObject fighterDamaged)
+    {
+        //AQUI SE UPDATEAN LOS VALORES DE LA VIDA.
+        HealthManager healthManager = fighterDamaged.GetComponent<HealthManager>();
+        PlayerInformation player = fighterDamaged.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>();
+
+        int lobbyId = lobbyManager.GetPlayersLobby(player.Id);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobby.GetPlayersIdsList()
+            }
+        };
+
+        int current_health = healthManager.healthPoints;
+        int max_health = healthManager.maxHealth;
+
+        string text = $"{current_health}/{max_health}";
+        Debug.Log($"{player.Username}: {text}");
+
+        int idInLobby = player.IdInLobby;
+
+        UpdateUIHealthClientRpc(text, idInLobby, clientRpcParams);
+    }
+
+    [ClientRpc]
+    public void UpdateUIHealthClientRpc(string text, int idInLobby, ClientRpcParams clientRpcParams = default)
+    {
+        playerHealthList[idInLobby].text = text;
     }
 
     public void UpdateUITimer(object sender, Match match)
 	{
         string text;
-        Debug.Log("Estoy en UpdateUITimer");
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -89,7 +183,6 @@ public class MatchUI : NetworkBehaviour
     [ClientRpc]
     private void ActualizarTiempoClientRpc(string text, ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log("CLIENTE RPC: Estoy en actualizar tiempo cliente rpc");
         textBoxTimer.text = $"{text}";
     }
 
@@ -105,6 +198,7 @@ public class MatchUI : NetworkBehaviour
             }
         };
 
+        DesactivateUIContainersClientRpc(match.Lobby.PlayersList.Count);
         UpdateEndUIClientRpc(clientRpcParams);
 
         postMatchUIScript.ComputeInterfaces(match);
@@ -118,6 +212,15 @@ public class MatchUI : NetworkBehaviour
         postMatchUI.SetActive(true);
     }
 
+    [ClientRpc]
+    void DesactivateUIContainersClientRpc(int n, ClientRpcParams clientRpcParams = default)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            playerContainerList[i].SetActive(false);
+        }
+    }
+ 
 
 
 

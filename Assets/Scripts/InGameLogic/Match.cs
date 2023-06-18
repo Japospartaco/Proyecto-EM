@@ -22,6 +22,7 @@ public class Match
     int current_round;
     int time_per_round;
 
+    public EventHandler<Match> StartMatch;
     public EventHandler<Match> EndMatchEvent;
 
     public Lobby Lobby { get { return lobby; } }
@@ -61,6 +62,11 @@ public class Match
 
         MAX_ROUNDS = n_rounds;
         this.time_per_round = time_per_round;
+
+        matchManager.AddEventStartMatch(this);
+
+        StartMatch?.Invoke(this, this);
+
         this.matchManager = matchManager;
 
         current_round = 0;
@@ -74,6 +80,7 @@ public class Match
         Round round = new Round(this, players, time_per_round);
 
         playing_round = round;
+
         matchManager.AddEventTimerMatch(playing_round.Timer);
         playing_round.StartRound();
 

@@ -11,7 +11,7 @@ public class CountdownTimer
     private float alarmTime;
     private bool started;
     public EventHandler Alarm;
-    public EventHandler<Match> UpdateUITime;
+    public EventHandler<Match> UpdateUITimeEvent;
 
     Round round;
 
@@ -52,7 +52,7 @@ public class CountdownTimer
 
         timer -= deltaTime;
 
-        UpdateUITime?.Invoke(this, round.Match);
+        UpdateUITimeEvent?.Invoke(this, round.Match);
         CheckAlarm();
     }
 

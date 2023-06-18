@@ -19,6 +19,18 @@ public class MatchManager : NetworkBehaviour
         matchList.Add(match);
     }
 
+    public void AddEventStartMatch(Match match)
+    {
+        if (!IsServer) return;
+        matchUI.SuscribirInicializarUIHealth(match);
+    }
+
+    public void AddEventHealthInterface(HealthManager fighterDamaged)
+    {
+        if (!IsServer) return;
+        matchUI.SuscribirInterfazVidas(fighterDamaged);
+    }
+
     public void AddEventTimerMatch(CountdownTimer countdownTimer)
 	{
         if (!IsServer) return;

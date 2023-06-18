@@ -88,8 +88,8 @@ namespace Movement.Components
         [ServerRpc]
         public void ComputeMoveServerRpc(IMoveableReceiver.Direction direction)
         {
-            if (!allowedMovement) return;
-            if (direction == IMoveableReceiver.Direction.None)
+
+            if (direction == IMoveableReceiver.Direction.None || !allowedMovement)
             {
                 this._direction = Vector3.zero;
                 return;

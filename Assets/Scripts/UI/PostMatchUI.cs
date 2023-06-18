@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -85,6 +86,8 @@ public class PostMatchUI : NetworkBehaviour
 
             MostrarInterfazJugadoresClientRpc(i, jugadores[i].SelectedFighter, text, winner.SelectedFighter, winner_text, clientRpcParams);
         }
+
+        MostrarInterfazGanadorClientRpc(winner.SelectedFighter, winner_text, clientRpcParams);
     }
 
     public void RemoveAllPlayersFromLobby(Match match)
@@ -101,8 +104,12 @@ public class PostMatchUI : NetworkBehaviour
 
         playersUI[index].SetActive(true);
         playersImage[index].sprite = fighters_sprite[selectedFighter];
-        playersInformation[index].text = text;
+        playersInformation[index].text = text; 
+    }
 
+    [ClientRpc]
+    void MostrarInterfazGanadorClientRpc(int winnerSelectedFighter, string textWinner, ClientRpcParams clientRpcParams = default)
+    {
         winnerImage.sprite = fighters_sprite[winnerSelectedFighter];
         winnerInformation.text = textWinner;
     }
@@ -130,7 +137,7 @@ public class PostMatchUI : NetworkBehaviour
         };
 
         ReturnSelectorClientRpc(clientRpcParams);
-
+        OcultarUIClientRpc(playersImage.Count, clientRpcParams);
     }
 
     [ClientRpc]
@@ -143,5 +150,14 @@ public class PostMatchUI : NetworkBehaviour
         lobbySelectorUI.SetActive(true);
 
         GetComponent<FighterSelectorUI>().OcultarHiddenObjects();
+    }
+
+    [ClientRpc]
+    void OcultarUIClientRpc(int countPlayers, ClientRpcParams clientRpcParams = default)
+    {
+        for(int i = 0; i < countPlayers; i++)
+        {
+            playersUI[i].SetActive(false);
+        }
     }
 }
