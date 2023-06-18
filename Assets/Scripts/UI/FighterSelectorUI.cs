@@ -15,6 +15,7 @@ public class FighterSelectorUI : NetworkBehaviour
 
     [SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject lobbySelectorUIObject;
+    [SerializeField] private GameObject chatSelectorUIObject;
 
     [SerializeField] private Button readyButton;
     [SerializeField] private Button refreshButton;
@@ -30,6 +31,7 @@ public class FighterSelectorUI : NetworkBehaviour
     private void Start()
     {
         fighterSelectorUIObject.SetActive(false);
+        
         readyButton.onClick.AddListener(OnReadyButtonPressed);
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
         returnButton.onClick.AddListener(OnReturnButtonPressed);
@@ -59,6 +61,7 @@ public class FighterSelectorUI : NetworkBehaviour
         refreshButton.gameObject.SetActive(true);
 
         fighterSelectorUIObject.SetActive(false);
+        chatSelectorUIObject.SetActive(false);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -190,5 +193,6 @@ public class FighterSelectorUI : NetworkBehaviour
     public void StartGameClientRpc()
     {
         fighterSelectorUIObject.SetActive(false);
+        chatSelectorUIObject.SetActive(false);
     }
 }

@@ -9,6 +9,7 @@ public class LobbySelectorUI : NetworkBehaviour
 {
     [SerializeField] private GameObject lobbySelectorUIObject;
     [SerializeField] private GameObject fighterSelectorUIObject;
+    [SerializeField] private GameObject chatSelectorUIObject;
 
     [SerializeField] private List<GameObject> lobbiesUIObjects;
 
@@ -48,6 +49,7 @@ public class LobbySelectorUI : NetworkBehaviour
         AddClientToLobbyServerRpc(0, NetworkManager.LocalClientId);
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
+        chatSelectorUIObject.SetActive(true);
 
     }
 
@@ -56,7 +58,7 @@ public class LobbySelectorUI : NetworkBehaviour
         AddClientToLobbyServerRpc(1, NetworkManager.LocalClientId);
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
-
+        chatSelectorUIObject.SetActive(true);
     }
 
     public void OnJoin2Pressed()
@@ -64,7 +66,7 @@ public class LobbySelectorUI : NetworkBehaviour
         AddClientToLobbyServerRpc(2, NetworkManager.LocalClientId);
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
-
+        chatSelectorUIObject.SetActive(true);
     }
 
     public void OnJoin3Pressed()
@@ -72,7 +74,7 @@ public class LobbySelectorUI : NetworkBehaviour
         AddClientToLobbyServerRpc(3, NetworkManager.LocalClientId);
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
-
+        chatSelectorUIObject.SetActive(true);
     }
 
     //METODO QUE UNE A JUGADOR A SALA Y ACTUALIZA INTERFAZ DE TODOS
@@ -93,6 +95,7 @@ public class LobbySelectorUI : NetworkBehaviour
         Debug.Log("CLIENTE: quiero crear sala");
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
+        chatSelectorUIObject.SetActive(true);
     }
 
     public void Refresh()
