@@ -30,10 +30,8 @@ public class PostMatchUI : NetworkBehaviour
     [SerializeField] Button buttonSalirDelJuego;
 
     [Space]
-    [SerializeField] MatchManager matchManager;
-
-
-    public MatchManager MatchPlayed { get { return matchManager; } set { matchManager = value; } }
+    [SerializeField] OnlinePlayers onlinePlayers;
+    [SerializeField] LobbyManager lobbyManager;
 
 
     // Start is called before the first frame update
@@ -41,13 +39,14 @@ public class PostMatchUI : NetworkBehaviour
     {
         postMatchUI.SetActive(false);
 
+        buttonVolverAJugar.onClick.AddListener(OnButtonPressedVolverAJugar);
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void ShowResult(Match match)
@@ -78,7 +77,7 @@ public class PostMatchUI : NetworkBehaviour
     }
 
     [ClientRpc]
-    void MostrarInterfazJugadoresClientRpc(int index, int selectedFighter, string text, int winnerSelectedFighter, string textWinner ,ClientRpcParams clientRpcParams = default)
+    void MostrarInterfazJugadoresClientRpc(int index, int selectedFighter, string text, int winnerSelectedFighter, string textWinner, ClientRpcParams clientRpcParams = default)
     {
         Debug.Log("Mostrando interfaz final");
 
@@ -92,6 +91,34 @@ public class PostMatchUI : NetworkBehaviour
 
     public void OnButtonPressedVolverAJugar()
     {
+        Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER A JUGAR");
+        ulong id = NetworkManager.LocalClientId;
+        ComputeOnButtonPressedServerRpc(id);
+    }
 
+    [ServerRpc(RequireOwnership = false)]
+    void ComputeOnButtonPressedServerRpc(ulong id)
+    {
+        Debug.Log("SERVIDOR: HE PRESIONADO EL BOTON");
+        GameObject player = onlinePlayers.ReturnPlayerGameObject(id);
+        
+        int lobbyId = player.GetComponent<PlayerInformation>().CurrentLobbyId;
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+        lobby.ResetPlayerReady();
+
+   
+        ReturnSelectorClientRpc(id);
+
+        fighterSelectorUI.GetComponent<FighterSelectorUI>().RefreshServerRpc(id, -1);
+    }
+
+    [ClientRpc]
+    public void ReturnSelectorClientRpc(ulong id)
+    {
+        if (NetworkManager.LocalClientId != id) return;
+        Debug.Log("CLIENTE: ME VOY A LA FIGHTER SELECTION");
+
+        postMatchUI.SetActive(false);
+        fighterSelectorUI.SetActive(true);
     }
 }

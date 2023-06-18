@@ -44,12 +44,23 @@ public class LobbyManager : NetworkBehaviour
     }
 
     //ELIMINAR LOBBY POR SU ID
+    /*
     public void EliminateLobby(int idLobby)
-    {
+    { 
         if (!IsServer) return;
-        lobbies.Remove(lobbies.Find(lobby => lobby.LobbyId == idLobby));
+        Lobby lobby = lobbies.Find(lobby => lobby.LobbyId == idLobby);
+
+        lobbies.Remove(lobby);
+
+        SuscribirLobby(lobby);
+
         LobbyEliminated?.Invoke(this, null);
     }
+
+    public void SuscribirLobby(Lobby lobby)
+    {
+        lobby.SuscribirEliminar();
+    }*/
 
     public int GetPlayersLobby(ulong playerId)
     {

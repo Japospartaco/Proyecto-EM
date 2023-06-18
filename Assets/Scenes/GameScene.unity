@@ -20535,7 +20535,8 @@ MonoBehaviour:
   winnerInformation: {fileID: 501092527}
   buttonVolverAJugar: {fileID: 1044673575}
   buttonSalirDelJuego: {fileID: 1590775237}
-  matchManager: {fileID: 476110323}
+  onlinePlayers: {fileID: 476110322}
+  lobbyManager: {fileID: 476110321}
 --- !u!1 &1773060825
 GameObject:
   m_ObjectHideFlags: 0
@@ -21143,7 +21144,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1880690263
 RectTransform:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -63,7 +64,22 @@ public class Lobby
         this.lobbyId = idLobby;
         this.lobbyManager = lobbyManager;
         this.onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
+
+ 
     }
+
+    /*
+    public void SuscribirEliminar()
+    {
+        lobbyManager.LobbyEliminated += EliminarLobby;
+    }
+
+    private void EliminarLobby(object sender, EventArgs e)
+    {
+
+
+        lobbyManager.LobbyEliminated -= EliminarLobby;
+    }*/
 
     public bool AddPlayerToLobby(ulong playerId)
     {
@@ -140,5 +156,11 @@ public class Lobby
             ids.Add(player.Id);
         }
         return ids;
+    }
+
+    public void ResetPlayerReady()
+    {
+        Debug.Log("Adios a todos los players");
+        readyPlayers.Clear();
     }
 }

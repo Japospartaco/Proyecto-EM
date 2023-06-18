@@ -103,7 +103,8 @@ public class FighterSelectorUI : NetworkBehaviour
         for (int i = 0; i < myLobby.PlayersInLobby; i++)
         {
             ulong id = myLobby.PlayersList[i].Id;
-            string text = "";
+            string text;
+
             if (myLobby.IsPlayerReady(id))
             {
                 text = $"{onlinePlayers.ReturnPlayerInformation(id).Username}\n" +
@@ -176,6 +177,7 @@ public class FighterSelectorUI : NetworkBehaviour
         {
             InstantiateCharacter(player.Id, player.SelectedFighter);
         }
+
         int n_rounds = 1;
         int time_per_round = 20;
 
