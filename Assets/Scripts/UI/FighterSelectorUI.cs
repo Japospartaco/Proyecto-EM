@@ -231,6 +231,7 @@ public class FighterSelectorUI : NetworkBehaviour
         matchManager.AddEventHealthInterface(characterGameObject.GetComponent<HealthManager>());
 
         characterGameObject.GetComponent<NetworkObject>().SpawnWithOwnership(id);
+        characterGameObject.GetComponent<NetworkObject>().DontDestroyWithOwner = true;
         characterGameObject.transform.SetParent(transform, false);
     }
 

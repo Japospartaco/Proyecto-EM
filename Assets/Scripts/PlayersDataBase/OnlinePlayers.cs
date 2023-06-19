@@ -82,8 +82,8 @@ public class OnlinePlayers : NetworkBehaviour
             fighter = onlinePlayers[clientId].GetComponent<PlayerInformation>().FighterObject;
             if (fighter)
             {
-                fighter.GetComponent<FighterInformation>().DoNotResuscitate = true;
-                new DieCommand(fighter.GetComponent<FighterMovement>()).Execute();
+                new TakeHitCommand(fighter.GetComponent<FighterMovement>(), 999).Execute();
+                fighter.GetComponent<FighterInformation>().IsDisconnected = true;
             }
             else Debug.Log("PERSONAJE NO ENCONETRADO");
         }

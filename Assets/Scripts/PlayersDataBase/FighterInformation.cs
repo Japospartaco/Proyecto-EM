@@ -8,7 +8,7 @@ public class FighterInformation : MonoBehaviour
 {
     [SerializeField] private GameObject player;
     [SerializeField] int winnedRounds = 0;
-    [SerializeField] bool doNotResuscitate = false; // CUANDO CLIENTE SE DESCONECTE NO QUEREMOS QUE REVIVA
+    [SerializeField] bool isDisconnected = false; // CUANDO CLIENTE SE DESCONECTE NO QUEREMOS QUE REVIVA
 
     public GameObject Player
     {
@@ -22,10 +22,10 @@ public class FighterInformation : MonoBehaviour
         set { winnedRounds = value; }
     }
 
-    public bool DoNotResuscitate
+    public bool IsDisconnected
     {
-        get { return doNotResuscitate; }
-        set { doNotResuscitate = value; }
+        get { return isDisconnected; }
+        set { isDisconnected = value; }
     }
 
 }

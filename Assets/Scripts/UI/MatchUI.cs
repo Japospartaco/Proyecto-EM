@@ -16,7 +16,7 @@ public class MatchUI : NetworkBehaviour
     [Space]
     [SerializeField] private TMP_Text textBoxTimer;
     [SerializeField] List<GameObject> playerContainerList;
-    
+
     [SerializeField] List<Image> playerImageList;
     [SerializeField] List<TMP_Text> playerUsernameList;
     [SerializeField] List<TMP_Text> playerHealthList;
@@ -38,7 +38,7 @@ public class MatchUI : NetworkBehaviour
         matchUI.SetActive(false);
         postMatchUIScript = GetComponent<PostMatchUI>();
 
-        foreach(var playerContainer in playerContainerList)
+        foreach (var playerContainer in playerContainerList)
         {
             originalColorList.Add(playerContainer.GetComponent<Image>().color);
         }
@@ -46,33 +46,33 @@ public class MatchUI : NetworkBehaviour
 
     public void SuscribirInicializarUIHealth(Match match)
     {
-        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de inicializar ui de health.");
+        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de inicializar ui de health.");
         match.StartMatch += InitializeUIHealth;
     }
 
     public void SuscribirInterfazVidas(HealthManager healthManager)
     {
-        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de vidas.");
+        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de vidas.");
         healthManager.DmgTakenEvent += UpdateUIHealth;
         healthManager.DeadEvent += UpdateUIHealth;
         healthManager.ResetHealthEvent += UpdateUIHealth;
     }
 
     public void SuscribirTiempo(CountdownTimer countdownTimer)
-	{
-        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de tiempo.");
+    {
+        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de tiempo.");
         countdownTimer.UpdateUITimeEvent += UpdateUITimer;
-	}
+    }
 
     public void SuscribirFinPartida(Match match)
     {
-        Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de fin de partida.");
+        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de fin de partida.");
         match.EndMatchEvent += UpdateEndUI;
     }
 
     public void InitializeUIHealth(object sender, Match match)
     {
-        Debug.Log("He llegado a inicializar UI Health"); // Llego aqui
+        // Debug.Log("He llegado a inicializar UI Health"); // Llego aqui
         List<PlayerInformation> listPlayers = match.Lobby.PlayersList;
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -83,7 +83,8 @@ public class MatchUI : NetworkBehaviour
             }
         };
 
-        for (int i = 0; i < listPlayers.Count; i++) {
+        for (int i = 0; i < listPlayers.Count; i++)
+        {
 
             PlayerInformation player = listPlayers[i];
             HealthManager healthManager = player.FighterObject.GetComponent<HealthManager>();
@@ -109,6 +110,11 @@ public class MatchUI : NetworkBehaviour
     public void UpdateUIHealth(object sender, GameObject fighterDamaged)
     {
         //AQUI SE UPDATEAN LOS VALORES DE LA VIDA.
+        if (fighterDamaged.GetComponent<FighterInformation>().IsDisconnected)
+        {
+            return;
+        }
+
         HealthManager healthManager = fighterDamaged.GetComponent<HealthManager>();
         PlayerInformation player = fighterDamaged.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>();
 
@@ -127,7 +133,7 @@ public class MatchUI : NetworkBehaviour
         int max_health = healthManager.maxHealth;
 
         string text = $"{current_health}/{max_health}";
-        Debug.Log($"{player.Username}: {text}");
+        // Debug.Log($"{player.Username}: {text}");
 
         int idInLobby = player.IdInLobby;
 
@@ -150,13 +156,13 @@ public class MatchUI : NetworkBehaviour
         playerContainerList[idInLobby].GetComponent<Image>().color = colorDeath;
 
         playerImageList[idInLobby].color = Color.black;
-        
+
 
         playerHealthList[idInLobby].text = text;
     }
 
     public void UpdateUITimer(object sender, Match match)
-	{
+    {
         string text;
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -179,7 +185,7 @@ public class MatchUI : NetworkBehaviour
     }
 
     string setText(int minutes, int seconds)
-	{
+    {
         string text;
         string minutes_string;
         string seconds_string;
@@ -208,7 +214,7 @@ public class MatchUI : NetworkBehaviour
 
     public void UpdateEndUI(object sender, Match match)
     {
-        Debug.Log("Estoy en UpdateEndUI");
+        // Debug.Log("Estoy en UpdateEndUI");
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -227,7 +233,7 @@ public class MatchUI : NetworkBehaviour
     [ClientRpc]
     void UpdateEndUIClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log("CLIENTE RPC: Cambiando UI partida a UI post partida");
+        //Debug.Log("CLIENTE RPC: Cambiando UI partida a UI post partida");
         matchUI.SetActive(false);
         postMatchUI.SetActive(true);
     }
@@ -235,12 +241,12 @@ public class MatchUI : NetworkBehaviour
     [ClientRpc]
     void DesactivateUIContainersClientRpc(int n, ClientRpcParams clientRpcParams = default)
     {
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             playerContainerList[i].SetActive(false);
         }
     }
- 
+
 
 
 

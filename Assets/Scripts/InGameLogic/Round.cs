@@ -231,7 +231,7 @@ public class Round
             };
 
             //Si DoNotResuscitate es true no se revive al personaje
-            if (!player.GetComponent<FighterInformation>().DoNotResuscitate)
+            if (!player.GetComponent<FighterInformation>().IsDisconnected)
                 new ReviveCommand(player.GetComponent<FighterMovement>()).Execute(clientRpcParams);
         }
     }
