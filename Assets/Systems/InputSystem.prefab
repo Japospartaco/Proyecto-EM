@@ -78,6 +78,23 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     m_Flags: 1
+  Dash:
+    m_Name: Dash
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 9a964296-a395-4ee3-bee6-0dc7f319084f
+    m_Processors: 
+    m_Interactions: Press(pressPoint=0.01,behavior=2)
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: c2fee762-d894-4154-8027-ddfe9ecad04f
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Dash
+      m_Flags: 0
+    m_Flags: 0
   Jump:
     m_Name: Jump
     m_Type: 0

@@ -23,6 +23,8 @@ namespace Systems
         }
 
         public InputAction Move;
+        public InputAction Dash;
+
         public InputAction Jump;
         public InputAction Attack1;
         public InputAction Attack2;
@@ -52,10 +54,16 @@ namespace Systems
                 { "stop", new StopCommand(character) },
                 { "walk-left", new WalkLeftCommand(character) },
                 { "walk-right", new WalkRightCommand(character) },
+
+                { "stop-dash", new StopDashCommand(character) },
+                { "dash", new DashCommand(character) },
+
+
                 { "jump", new JumpCommand(character) },
                 { "land", new LandCommand(character) },
-                { "attack1", new Attack1Command(character) },
-                { "attack2", new Attack2Command(character) }
+
+                { "attack1", new Attack1Command(character) }, 
+                { "attack2", new Attack2Command(character) },
             };
 
             Move.performed += OnMove;
@@ -63,6 +71,9 @@ namespace Systems
 
             Jump.performed += OnJump;
             Jump.Enable();
+
+            Dash.performed += OnDash;
+            Dash.Enable();
 
             Attack1.started += context =>
             {
@@ -77,6 +88,7 @@ namespace Systems
             Attack2.Enable();
         }
 
+        
         public void OnMove(InputAction.CallbackContext context)
         {
             float value = context.ReadValue<float>();
@@ -111,6 +123,23 @@ namespace Systems
             {
                 _commands["jump"].Execute();
             }
+        }
+
+        public void OnDash(InputAction.CallbackContext context)
+        {
+            float value = context.ReadValue<float>();
+
+            // Debug.Log($"OnMove called {context.action}");
+
+            if (value == 0f)
+            {
+                _commands["stop-dash"].Execute();
+            }
+            else
+            {
+                _commands["dash"].Execute();
+            }
+
         }
     }
 }
