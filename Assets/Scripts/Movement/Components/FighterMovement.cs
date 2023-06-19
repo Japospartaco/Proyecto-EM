@@ -101,10 +101,8 @@ namespace Movement.Components
         [ServerRpc]
         public void ComputeMoveServerRpc(IMoveableReceiver.Direction direction)
         {
-
             if (direction == IMoveableReceiver.Direction.None || !allowedMovement)
             {
-
                 this._direction = Vector3.zero;
                 return;
             }
@@ -123,6 +121,7 @@ namespace Movement.Components
         [ServerRpc]
         public void ComputeDashServerRpc(IDashReceiver.Stage stage)
         {
+            if (!allowedMovement) return;
             switch (stage)
             {
                 case IDashReceiver.Stage.Dashed:
