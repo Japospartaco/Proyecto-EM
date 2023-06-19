@@ -16,6 +16,7 @@ public class MatchUI : NetworkBehaviour
     [Space]
     [SerializeField] private TMP_Text textBoxTimer;
     [SerializeField] List<GameObject> playerContainerList;
+    
     [SerializeField] List<Image> playerImageList;
     [SerializeField] List<TMP_Text> playerUsernameList;
     [SerializeField] List<TMP_Text> playerHealthList;
@@ -28,17 +29,19 @@ public class MatchUI : NetworkBehaviour
 
     public EventHandler UpdateUITime;
 
+    private List<Color> originalColorList = new();
+    private Vector4 colorDeath = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+
     // Start is called before the first frame update
     void Start()
     {
         matchUI.SetActive(false);
         postMatchUIScript = GetComponent<PostMatchUI>();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        foreach(var playerContainer in playerContainerList)
+        {
+            originalColorList.Add(playerContainer.GetComponent<Image>().color);
+        }
     }
 
     public void SuscribirInicializarUIHealth(Match match)
@@ -50,7 +53,9 @@ public class MatchUI : NetworkBehaviour
     public void SuscribirInterfazVidas(HealthManager healthManager)
     {
         Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de vidas.");
-        healthManager.DmgTaken += UpdateUIHealth;
+        healthManager.DmgTakenEvent += UpdateUIHealth;
+        healthManager.DeadEvent += UpdateUIHealth;
+        healthManager.ResetHealthEvent += UpdateUIHealth;
     }
 
     public void SuscribirTiempo(CountdownTimer countdownTimer)
@@ -64,7 +69,7 @@ public class MatchUI : NetworkBehaviour
         Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de fin de partida.");
         match.EndMatchEvent += UpdateEndUI;
     }
-    
+
     public void InitializeUIHealth(object sender, Match match)
     {
         Debug.Log("He llegado a inicializar UI Health"); // Llego aqui
@@ -126,12 +131,27 @@ public class MatchUI : NetworkBehaviour
 
         int idInLobby = player.IdInLobby;
 
-        UpdateUIHealthClientRpc(text, idInLobby, clientRpcParams);
+        if (current_health > 0) UpdateUIHealthClientRpc(text, idInLobby, clientRpcParams);
+        else UpdateDeadHealthClientRpc(text, idInLobby, clientRpcParams);
     }
 
     [ClientRpc]
     public void UpdateUIHealthClientRpc(string text, int idInLobby, ClientRpcParams clientRpcParams = default)
     {
+        playerContainerList[idInLobby].GetComponent<Image>().color = originalColorList[idInLobby];
+        playerImageList[idInLobby].color = Color.white;
+
+        playerHealthList[idInLobby].text = text;
+    }
+
+    [ClientRpc]
+    public void UpdateDeadHealthClientRpc(string text, int idInLobby, ClientRpcParams clientRpcParams = default)
+    {
+        playerContainerList[idInLobby].GetComponent<Image>().color = colorDeath;
+
+        playerImageList[idInLobby].color = Color.black;
+        
+
         playerHealthList[idInLobby].text = text;
     }
 

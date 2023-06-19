@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class PostMatchUI : NetworkBehaviour
@@ -13,6 +14,8 @@ public class PostMatchUI : NetworkBehaviour
     [SerializeField] GameObject matchUI;
     [SerializeField] GameObject postMatchUI;
     [SerializeField] GameObject lobbySelectorUI;
+    [SerializeField] GameObject fighterSelectorUI;
+    [SerializeField] GameObject chatUI;
 
     [Space]
     [SerializeField] List<GameObject> playersUI;
@@ -27,13 +30,15 @@ public class PostMatchUI : NetworkBehaviour
     [SerializeField] TMP_Text winnerInformation;
 
     [Space]
-    [SerializeField] Button buttonVolverAJugar;
-    [SerializeField] Button buttonSalirDelJuego;
+    [SerializeField] Button buttonReturnLobbySelector;
+    [SerializeField] Button buttonReturnFighterSelector;
 
     [Space]
     [SerializeField] OnlinePlayers onlinePlayers;
     [SerializeField] LobbyManager lobbyManager;
     [SerializeField] MatchManager matchManager;
+
+    int clientLobbyId;
     //[SerializeField] MatchManager match;
 
     private LobbySelectorUI lobbySelector;
@@ -43,22 +48,37 @@ public class PostMatchUI : NetworkBehaviour
     {
         postMatchUI.SetActive(false);
 
-        buttonVolverAJugar.onClick.AddListener(OnButtonPressedVolverAJugar);
+        buttonReturnLobbySelector.onClick.AddListener(OnButtonReturnLobbySelectorPressed);
+        buttonReturnFighterSelector.onClick.AddListener(OnButtonReturnFighterSelectorPressed);
 
         lobbySelector = GetComponent<LobbySelectorUI>();
     }
 
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     public void ComputeInterfaces(Match match)
     {
+        int lobbyId = match.Lobby.LobbyId;
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = match.Lobby.GetPlayersIdsList()
+            }
+        };
+
+        SelectLobbyIDClientRpc(lobbyId, clientRpcParams);
+
         ShowResult(match);
         matchManager.Destroy(match);
         RemoveAllPlayersFromLobby(match);
+    }
+
+    [ClientRpc]
+    void SelectLobbyIDClientRpc(int lobbyId, ClientRpcParams clientRpcParams = default)
+    {
+        clientLobbyId = lobbyId;
+        Debug.Log($"{NetworkManager.LocalClientId}: lobby id seteado.");
     }
 
     void ShowResult(Match match)
@@ -90,12 +110,6 @@ public class PostMatchUI : NetworkBehaviour
         MostrarInterfazGanadorClientRpc(winner.SelectedFighter, winner_text, clientRpcParams);
     }
 
-    public void RemoveAllPlayersFromLobby(Match match)
-    {
-        Lobby lobby = match.Lobby;
-        lobby.RemoveAllPlayers();
-    }
-
 
     [ClientRpc]
     void MostrarInterfazJugadoresClientRpc(int index, int selectedFighter, string text, int winnerSelectedFighter, string textWinner, ClientRpcParams clientRpcParams = default)
@@ -114,19 +128,25 @@ public class PostMatchUI : NetworkBehaviour
         winnerInformation.text = textWinner;
     }
 
-    public void OnButtonPressedVolverAJugar()
+    public void RemoveAllPlayersFromLobby(Match match)
     {
-        Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER A JUGAR");
+        Lobby lobby = match.Lobby;
+        lobby.RemoveAllPlayers();
+    }
+
+    public void OnButtonReturnLobbySelectorPressed()
+    {
+        Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
         ulong id = NetworkManager.LocalClientId;
-        ComputeOnButtonPressedServerRpc(id);
+        ComputeOnButtonReturnLobbySelectorPressedServerRpc(id);
 
         lobbySelector.RefreshServerRpc(id);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void ComputeOnButtonPressedServerRpc(ulong clientId)
+    void ComputeOnButtonReturnLobbySelectorPressedServerRpc(ulong clientId)
     {
-        Debug.Log("SERVIDOR: HE PRESIONADO EL BOTON");
+        Debug.Log("SERVIDOR: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -136,26 +156,67 @@ public class PostMatchUI : NetworkBehaviour
             }
         };
 
-        ReturnSelectorClientRpc(clientRpcParams);
+        ReturnToLobbySelectorClientRpc(clientRpcParams);
         OcultarUIClientRpc(playersImage.Count, clientRpcParams);
     }
 
     [ClientRpc]
-    public void ReturnSelectorClientRpc(ClientRpcParams clientRpcParams = default)
+    public void ReturnToLobbySelectorClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log("CLIENTE: ME VOY A LA FIGHTER SELECTION");
+        Debug.Log("CLIENTE: ME VOY A LA LOBBY SELECTOR");
 
         postMatchUI.SetActive(false);
 
         lobbySelectorUI.SetActive(true);
 
-        GetComponent<FighterSelectorUI>().OcultarHiddenObjects();
+       // GetComponent<FighterSelectorUI>().OcultarHiddenObjects();
+    }
+
+
+
+    void OnButtonReturnFighterSelectorPressed()
+    {
+        Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
+
+        ComputeOnButtonReturnFighterSelectorPressedServerRpc(NetworkManager.LocalClientId, clientLobbyId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ComputeOnButtonReturnFighterSelectorPressedServerRpc(ulong clientId, int clientLobbyId)
+    {
+        Debug.Log("SERVIDOR: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientId }
+            }
+        };
+
+        lobbyManager.AddPlayerToLobby(clientLobbyId, clientId);
+
+        ReturnToFighterSelectorClientRpc(clientRpcParams);
+        OcultarUIClientRpc(playersImage.Count, clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void ReturnToFighterSelectorClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        Debug.Log("CLIENTE: ME VOY A LA FIGHTER SELECTION");
+
+        postMatchUI.SetActive(false);
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
+
+        fighterSelectorUI.SetActive(true);
+        chatUI.SetActive(true);
+        GetComponent<ChatUI>().ResetChat();
     }
 
     [ClientRpc]
     void OcultarUIClientRpc(int countPlayers, ClientRpcParams clientRpcParams = default)
     {
-        for(int i = 0; i < countPlayers; i++)
+        for (int i = 0; i < countPlayers; i++)
         {
             playersUI[i].SetActive(false);
         }
