@@ -49,9 +49,6 @@ public class Match
         set { idLobby = value; }
 	}
 
-    
-
-
     public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager)
 	{
         Debug.Log("He empezado la partida.");
@@ -70,7 +67,6 @@ public class Match
         this.matchManager = matchManager;
 
         current_round = 0;
-
 
         StartRoundFromMatch();
     }
@@ -95,15 +91,27 @@ public class Match
         else
             Debug.Log($"Ronda {current_round} empatada.");
 
-        if (current_round != MAX_ROUNDS)
+        if ((DesconectadosInGame() == players.Count - 1) || (current_round == MAX_ROUNDS))
+        {
+            EndMatch();
+        } 
+        else
 		{
             StartRoundFromMatch();
             Debug.Log("Empezando siguiente ronda...");
         }
-        else
-		{
-            EndMatch();
+    }
+
+    public int DesconectadosInGame()
+    {
+        int desconectados = 0;
+        foreach (var player in players)
+        {
+            FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
+            if (fighterInformation.IsDisconnected) desconectados++;
         }
+
+        return desconectados;
     }
 
     public void EndMatch()
@@ -123,29 +131,38 @@ public class Match
 
         int max_ganadas = 0;
 
-        foreach(var player in players)
-        {
-            FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
-            int ganadas = fighterInformation.WinnedRounds;
-
-            if (max_ganadas < ganadas)
-            {
-                max_ganadas = ganadas;
-            }
-        }
-
+        //////////////////////////////TERMINAR PARTIDA PUNTOS//////////////////////////////////////////
         foreach (var player in players)
         {
             FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
-            int ganadas = fighterInformation.WinnedRounds;
 
-            if (max_ganadas == ganadas)
+            if (!fighterInformation.IsDisconnected)
             {
-                winner = player;
+                int ganadas = fighterInformation.WinnedRounds;
+
+                if (max_ganadas < ganadas)
+                {
+                    max_ganadas = ganadas;
+                    winner = player;    //EN CASO DE QUE NO VAYA, COMENTAR ESTA LINEA Y DESCOMENTAR EL CHORIZO DE ABAJO
+                }
             }
         }
 
+        /*foreach (var player in players)
+        {
+            FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
+
+            if (!fighterInformation.IsDisconnected)
+            {
+                int ganadas = fighterInformation.WinnedRounds;
+
+                if (max_ganadas == ganadas)
+                {
+                    winner = player;
+                }
+            }
+        }*/
+
         return winner;
 	}
-
 }

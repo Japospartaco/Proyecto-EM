@@ -85,7 +85,6 @@ public class MatchUI : NetworkBehaviour
 
         for (int i = 0; i < listPlayers.Count; i++)
         {
-
             PlayerInformation player = listPlayers[i];
             HealthManager healthManager = player.FighterObject.GetComponent<HealthManager>();
 
