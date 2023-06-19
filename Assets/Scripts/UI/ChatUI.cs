@@ -7,22 +7,18 @@ using UnityEngine.UI;
 
 public class ChatUI : NetworkBehaviour
 {
-    public TMPro.TMP_Text[] mensaje = new TMPro.TMP_Text[4];
-    public int i = 0;
-    public string input;
-    public TMP_InputField nameInput;
-    private OnlinePlayers onlinePlayers;
+    [SerializeField] GameObject ChatUIObject;
+    [SerializeField] List<TMP_Text> mensajes;
+    [SerializeField] TMP_InputField nameInput;
+    [SerializeField] OnlinePlayers onlinePlayers;
+    
+
     // Start is called before the first frame update
     void Start()
     {
-        onlinePlayers = FindObjectOfType<OnlinePlayers>();
+        ChatUIObject.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     [ClientRpc]
     public void AddMessageClientRpc(string msg, string username)
@@ -32,9 +28,9 @@ public class ChatUI : NetworkBehaviour
 
             for (int j = 0; j < 3; j++)
             {
-                mensaje[j].text = mensaje[j+1].text;
+                mensajes[j].text = mensajes[j+1].text;
             }
-            mensaje[3].text = chat;
+            mensajes[3].text = chat;
             Debug.Log(chat);
         
     }
