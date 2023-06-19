@@ -10,6 +10,8 @@ TagManager:
   - Spawn positions
   - cambios de marco
   - Canvas
+  - Clock UI
+  - Network Manager
   layers:
   - Default
   - TransparentFX

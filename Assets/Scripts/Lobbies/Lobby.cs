@@ -179,7 +179,7 @@ public class Lobby
 
         while (playersInformation.Count > 0)
         {
-            RemovePlayerFromLobby(playersInformation[0].Id);
+            RemovePlayerFromLobby(playersInformation[0]);
         }
 
         readyPlayers.Clear();
@@ -187,4 +187,21 @@ public class Lobby
         isStarted = false;
         isPrivate = false;
     }
+
+    public void RemovePlayerFromLobby(PlayerInformation player)
+    {
+
+        //ACTUALIZAR VALOR DE LOS ID EN LOBBY A PARTIR DEL ELIMINADO
+        for (int i = player.IdInLobby + 1; i < playersInformation.Count; i++)
+        {
+            playersInformation[i].IdInLobby--;
+        }
+
+        playersInformation.RemoveAt(player.IdInLobby);
+
+        //PONER POR DEFECTO LOS VALORES DE LOBBY EN PLAYER INFORMATION
+        player.ResetAfterExitingLobby();
+    
+    }
+
 }
