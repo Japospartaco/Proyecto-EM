@@ -7,35 +7,37 @@ using UnityEngine.UI;
 
 public class ChatUI : NetworkBehaviour
 {
+    [Space]
     [SerializeField] GameObject ChatUIObject;
-    [SerializeField] List<TMP_Text> mensajes;
-    [SerializeField] TMP_InputField nameInput;
+
+    [Space]
+    [SerializeField] List<TMP_Text> textBoxMensajesList;
+    
+    [Space]
+    [SerializeField] LobbyManager lobbyManager;
     [SerializeField] OnlinePlayers onlinePlayers;
+
+    int MAX_MENSAJES;
     
 
     // Start is called before the first frame update
     void Start()
     {
         ChatUIObject.SetActive(false);
+
+        MAX_MENSAJES = textBoxMensajesList.Count;
     }
 
 
-    [ClientRpc]
-    public void AddMessageClientRpc(string msg, string username)
+    public void ResetChat()
     {
-        Debug.Log(username + ": " + msg);
-        string chat = $"{username} : {msg}";
-
-            for (int j = 0; j < 3; j++)
-            {
-                mensajes[j].text = mensajes[j+1].text;
-            }
-            mensajes[3].text = chat;
-            Debug.Log(chat);
-        
+        foreach(var textBox in textBoxMensajesList)
+        {
+            textBox.text = "";
+        }
     }
 
-    public void ReadStringInClient(string s)
+    public void ReadStringInClient(string message)
     {
         if (!IsClient)
         {
@@ -43,15 +45,38 @@ public class ChatUI : NetworkBehaviour
             return;
         }
         ulong id = NetworkManager.LocalClientId;
-        ReadStringServerRpc(id, s);
+        ReadStringServerRpc(id, message);
         
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void ReadStringServerRpc(ulong id, string s)
+    public void ReadStringServerRpc(ulong id, string message)
     {
-        string handler = $"{onlinePlayers.ReturnPlayerInformation(id).Username}";
-        AddMessageClientRpc(s, handler);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobbyManager.GetLobbyFromId(lobbyManager.GetPlayersLobby(id)).GetPlayersIdsList()
+            }
+        };
+
+        string username = $"{onlinePlayers.ReturnPlayerInformation(id).Username}";
+        AddMessageClientRpc(username, message, clientRpcParams);
+    }
+
+    [ClientRpc]
+    public void AddMessageClientRpc(string username, string msg, ClientRpcParams clientRpcParams = default)
+    {
+        Debug.Log(username + ": " + msg);
+        string chat = $"{username} : {msg}";
+
+        for (int j = 0; j < MAX_MENSAJES - 1; j++)
+        {
+            textBoxMensajesList[j].text = textBoxMensajesList[j + 1].text;
+        }
+        textBoxMensajesList[MAX_MENSAJES - 1].text = chat;
+        Debug.Log(chat);
     }
 
 }

@@ -12,9 +12,9 @@ public class FighterSelectorUI : NetworkBehaviour
     [SerializeField] private List<TMP_Text> playersText;
 
     [Space][SerializeField] private GameObject fighterSelectorUIObject;
+    [SerializeField] private GameObject chatUIObject;
     [SerializeField] private GameObject lobbySelectorUIObject;
     [SerializeField] private GameObject matchUIObject;
-    [SerializeField] private GameObject chatSelectorUIObject;
 
     [Space][SerializeField] private Button readyButton;
     [SerializeField] private Button returnButton;
@@ -72,7 +72,7 @@ public class FighterSelectorUI : NetworkBehaviour
         }
 
         fighterSelectorUIObject.SetActive(false);
-        chatSelectorUIObject.SetActive(false);
+        chatUIObject.SetActive(false);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -246,7 +246,7 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         OcultarRoundTimeOptions();
         fighterSelectorUIObject.SetActive(false);
-        chatSelectorUIObject.SetActive(false);
+        chatUIObject.SetActive(false);
         matchUIObject.SetActive(true);
     }
     public void OcultarRoundTimeOptions()

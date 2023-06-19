@@ -9,7 +9,7 @@ public class LobbySelectorUI : NetworkBehaviour
 {
     [SerializeField] private GameObject lobbySelectorUIObject;
     [SerializeField] private GameObject fighterSelectorUIObject;
-    [SerializeField] private GameObject chatSelectorUIObject;
+    [SerializeField] private GameObject chatUIObject;
 
     [SerializeField] private List<GameObject> lobbiesUIObjects;
 
@@ -101,7 +101,8 @@ public class LobbySelectorUI : NetworkBehaviour
     {
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
-        chatSelectorUIObject.SetActive(true);
+        chatUIObject.SetActive(true);
+        GetComponent<ChatUI>().ResetChat();
     }
 
     public void OnCreateLobbyPressed()
@@ -110,8 +111,9 @@ public class LobbySelectorUI : NetworkBehaviour
         Debug.Log("CLIENTE: quiero crear sala");
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
         lobbySelectorUIObject.SetActive(false);
+        chatUIObject.SetActive(true);
+        GetComponent<ChatUI>().ResetChat();
         fighterSelectorUIObject.SetActive(true);
-        chatSelectorUIObject.SetActive(true);
     }
 
     public void Refresh()

@@ -15,6 +15,7 @@ public class PostMatchUI : NetworkBehaviour
     [SerializeField] GameObject postMatchUI;
     [SerializeField] GameObject lobbySelectorUI;
     [SerializeField] GameObject fighterSelectorUI;
+    [SerializeField] GameObject chatUI;
 
     [Space]
     [SerializeField] List<GameObject> playersUI;
@@ -208,6 +209,8 @@ public class PostMatchUI : NetworkBehaviour
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
 
         fighterSelectorUI.SetActive(true);
+        chatUI.SetActive(true);
+        GetComponent<ChatUI>().ResetChat();
     }
 
     [ClientRpc]
