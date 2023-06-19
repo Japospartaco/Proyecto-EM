@@ -55,6 +55,7 @@ public class PlayerInformation : MonoBehaviour
         this.fighterObject = fighterObject;
         this.currentLobbyId = currentLobbyId;
         this.idInLobby = idInLobby;
+        this.selectedFighter = 0;
     }
 
     //METODO PARA RESTAURAR LOS VALORES RELACIONADOS CON "LOBBY" AL SALIR DE UNA

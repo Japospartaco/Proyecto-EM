@@ -59,7 +59,7 @@ public class Lobby
 
     public int RoundNumber
     {
-        get { return roundNumber;}
+        get { return roundNumber; }
         set { roundNumber = value; }
     }
 
@@ -81,7 +81,7 @@ public class Lobby
         this.lobbyManager = lobbyManager;
         this.onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
 
- 
+
     }
 
     /*
