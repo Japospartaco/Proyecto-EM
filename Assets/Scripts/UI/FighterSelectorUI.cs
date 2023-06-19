@@ -283,8 +283,8 @@ public class FighterSelectorUI : NetworkBehaviour
 
     public void OnCharacterChanged(int value)
     { 
-        Debug.Log("CLIENTE CAMBIA RONDA: " + value);
-        RoundsChangedServerRpc(NetworkManager.LocalClientId, value);
+        Debug.Log("CLIENTE CAMBIA Personaje: " + value);
+        CharacterChangedServerRpc(NetworkManager.LocalClientId, value);
     }
 
     [ServerRpc(RequireOwnership = false)]

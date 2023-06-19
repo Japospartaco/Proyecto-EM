@@ -21921,7 +21921,19 @@ MonoBehaviour:
       m_Image: {fileID: -282000456, guid: 70206f776831c844a9f7ffdbcd49df1c, type: 3}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1769254128}
+        m_TargetAssemblyTypeName: FighterSelectorUI, Assembly-CSharp
+        m_MethodName: OnCharacterChanged
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &1448003293
 MonoBehaviour:
@@ -24654,7 +24666,7 @@ MonoBehaviour:
   - {fileID: 744300536}
   - {fileID: 762704173}
   fighterSelectorUIObject: {fileID: 2025362546}
-  chatUIObject: {fileID: 0}
+  chatUIObject: {fileID: 845733401}
   lobbySelectorUIObject: {fileID: 173575305}
   matchUIObject: {fileID: 811145708}
   readyButton: {fileID: 695486426}
@@ -24762,7 +24774,7 @@ MonoBehaviour:
   postMatchUI: {fileID: 1880690262}
   lobbySelectorUI: {fileID: 173575305}
   fighterSelectorUI: {fileID: 2025362546}
-  chatUI: {fileID: 0}
+  chatUI: {fileID: 845733401}
   playersUI:
   - {fileID: 933601103}
   - {fileID: 1773060825}
