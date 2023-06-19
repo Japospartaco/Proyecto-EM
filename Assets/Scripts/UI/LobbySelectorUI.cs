@@ -48,37 +48,24 @@ public class LobbySelectorUI : NetworkBehaviour
     {
         AddClientToLobbyServerRpc(0, NetworkManager.LocalClientId);
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
-        lobbySelectorUIObject.SetActive(false);
-        fighterSelectorUIObject.SetActive(true);
-        chatSelectorUIObject.SetActive(true);
-
     }
 
     public void OnJoin1Pressed()
     {
         AddClientToLobbyServerRpc(1, NetworkManager.LocalClientId);
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
-        lobbySelectorUIObject.SetActive(false);
-        fighterSelectorUIObject.SetActive(true);
-        chatSelectorUIObject.SetActive(true);
     }
 
     public void OnJoin2Pressed()
     {
         AddClientToLobbyServerRpc(2, NetworkManager.LocalClientId);
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
-        lobbySelectorUIObject.SetActive(false);
-        fighterSelectorUIObject.SetActive(true);
-        chatSelectorUIObject.SetActive(true);
     }
 
     public void OnJoin3Pressed()
     {
         AddClientToLobbyServerRpc(3, NetworkManager.LocalClientId);
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
-        lobbySelectorUIObject.SetActive(false);
-        fighterSelectorUIObject.SetActive(true);
-        chatSelectorUIObject.SetActive(true);
     }
 
     //METODO QUE UNE A JUGADOR A SALA Y ACTUALIZA INTERFAZ DE TODOS
@@ -114,6 +101,7 @@ public class LobbySelectorUI : NetworkBehaviour
     {
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
+        chatSelectorUIObject.SetActive(true);
     }
 
     public void OnCreateLobbyPressed()
