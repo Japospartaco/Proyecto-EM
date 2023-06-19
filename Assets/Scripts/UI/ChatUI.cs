@@ -23,6 +23,14 @@ public class ChatUI : NetworkBehaviour
     {
         
     }
+    public void ResetChat()
+    {
+
+        for (int j = 0; j < 4; j++)
+        {
+            mensaje[j].text = "";
+        }
+    }
 
     [ClientRpc]
     public void AddMessageClientRpc(string msg, string username)

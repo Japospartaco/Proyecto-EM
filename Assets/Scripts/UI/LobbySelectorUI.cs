@@ -10,6 +10,7 @@ public class LobbySelectorUI : NetworkBehaviour
     [SerializeField] private GameObject lobbySelectorUIObject;
     [SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject chatSelectorUIObject;
+    private ChatUI chatUI;
 
     [SerializeField] private List<GameObject> lobbiesUIObjects;
 
@@ -36,6 +37,8 @@ public class LobbySelectorUI : NetworkBehaviour
 
         lobbyManager = GameObject.FindWithTag("Game Manager").GetComponent<LobbyManager>();
         if (lobbyManager == null) Debug.Log("LOBBY MANAGER NO ENCONTRAO");
+
+        chatUI = FindObjectOfType<ChatUI>();
     }
 
 
@@ -50,7 +53,7 @@ public class LobbySelectorUI : NetworkBehaviour
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
         chatSelectorUIObject.SetActive(true);
-
+        chatUI.ResetChat();
     }
 
     public void OnJoin1Pressed()
@@ -59,6 +62,8 @@ public class LobbySelectorUI : NetworkBehaviour
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
         chatSelectorUIObject.SetActive(true);
+        chatUI.ResetChat();
+
     }
 
     public void OnJoin2Pressed()
@@ -67,6 +72,7 @@ public class LobbySelectorUI : NetworkBehaviour
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
         chatSelectorUIObject.SetActive(true);
+        chatUI.ResetChat();
     }
 
     public void OnJoin3Pressed()
@@ -75,6 +81,7 @@ public class LobbySelectorUI : NetworkBehaviour
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
         chatSelectorUIObject.SetActive(true);
+        chatUI.ResetChat();
     }
 
     //METODO QUE UNE A JUGADOR A SALA Y ACTUALIZA INTERFAZ DE TODOS
@@ -103,6 +110,7 @@ public class LobbySelectorUI : NetworkBehaviour
         Debug.Log("CLIENTE: actualizando interfaz");
 
         RefreshServerRpc(NetworkManager.LocalClientId);
+
     }
 
     //METODO QUE ACTUALIZA INTERFAZ DE UN UNICO PLAYER
@@ -146,5 +154,6 @@ public class LobbySelectorUI : NetworkBehaviour
         lobbiesUIObjects[i].SetActive(true);
         joinButtonTexts[i].text = $"Lobby {lobbyId + 1}";
         numPlayerstexts[i].text = $"{playersInLobby}/4";
+
     }
 }
