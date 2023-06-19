@@ -24,7 +24,7 @@ public class FighterSelectorUI : NetworkBehaviour
     [Space][SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
 
-    [Space] [SerializeField] private MatchManager matchManager;
+    [Space][SerializeField] private MatchManager matchManager;
     [SerializeField] private TMP_Dropdown roundNumberSelectorInput;
     [SerializeField] private int[] roundNumberOptions;
 
@@ -52,11 +52,6 @@ public class FighterSelectorUI : NetworkBehaviour
 
     }
 
-    //METODO PARA OBTENER EL VALOR DEL DROPDOWN DE SELECCION DE PERSONAJE
-    public int GetSelectedFighter()
-    {
-        return fighterSelectorInput.value;
-    }
 
     public void OnReturnButtonPressed()
     {
@@ -72,7 +67,7 @@ public class FighterSelectorUI : NetworkBehaviour
         timeSelectorInput.gameObject.SetActive(false);
         roundNumberSelectorInput.gameObject.SetActive(false);
 
-        foreach(var text in playersText)
+        foreach (var text in playersText)
         {
             text.text = "NONE";
         }
@@ -188,14 +183,12 @@ public class FighterSelectorUI : NetworkBehaviour
     public void OnReadyButtonPressed()
     {
         //IMPLEMENTAR EL SISTEMA DE READYS E INICIAR LA PARTIDA
-        PlayerReadyServerRpc(NetworkManager.LocalClientId, GetSelectedFighter());
+        PlayerReadyServerRpc(NetworkManager.LocalClientId);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void PlayerReadyServerRpc(ulong playerId, int selectedFighter)
+    public void PlayerReadyServerRpc(ulong playerId)
     {
-        onlinePlayers.ReturnPlayerInformation(playerId).SelectedFighter = selectedFighter;
-
         Lobby lobby = lobbyManager.GetLobbyFromId(lobbyManager.GetPlayersLobby(playerId));
         lobby.PlayerReady(playerId);
 
@@ -239,7 +232,7 @@ public class FighterSelectorUI : NetworkBehaviour
         };
 
         StartGameClientRpc(clientRpcParams);
-        
+
         matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager));
     }
 
@@ -270,7 +263,7 @@ public class FighterSelectorUI : NetworkBehaviour
     public void OnTimeChanged(int value)
     {
         Debug.Log("CLIENTE CAMBIA TIEMPO: " + value);
-        TimeChangedServerRpc(NetworkManager.LocalClientId ,timeOptions[value]);
+        TimeChangedServerRpc(NetworkManager.LocalClientId, timeOptions[value]);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -280,7 +273,7 @@ public class FighterSelectorUI : NetworkBehaviour
         Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
 
         lobby.RoundTime = time;
-        Debug.Log("SERVER ACTUALIZA TIEMPO: " +lobby.RoundTime);
+        Debug.Log("SERVER ACTUALIZA TIEMPO: " + lobby.RoundTime);
     }
 
     public void OnRoundsChanged(int value)
@@ -298,5 +291,18 @@ public class FighterSelectorUI : NetworkBehaviour
 
         lobby.RoundNumber = rounds;
         Debug.Log("SERVER ACTUALIZA RONDAS: " + lobby.RoundNumber);
+    }
+
+    public void OnCharacterChanged(int value)
+    { 
+        Debug.Log("CLIENTE CAMBIA RONDA: " + value);
+        RoundsChangedServerRpc(NetworkManager.LocalClientId, value);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CharacterChangedServerRpc(ulong clientId, int selectedFighter)
+    {
+        onlinePlayers.ReturnPlayerInformation(clientId).SelectedFighter = selectedFighter;
+        
     }
 }
