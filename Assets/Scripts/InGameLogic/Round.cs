@@ -104,8 +104,19 @@ public class Round
 
         foreach (var player in fighters)
         {
-            fighters_alive.Add(player);
+            if (player.GetComponent<FighterInformation>().IsDisconnected)
+            {
+                fighters_dead.Add(player);
+            }
+            else
+            {
+                fighters_alive.Add(player);
+            }
         }
+
+        if (fighters_alive.Count == 1)
+            EndRoundByLastOne();
+
     }
 
     private void EndRoundByTimer(object sender, EventArgs e)
