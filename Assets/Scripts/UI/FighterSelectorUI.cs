@@ -9,8 +9,6 @@ using Unity.Netcode;
 
 public class FighterSelectorUI : NetworkBehaviour
 {
-    [SerializeField] private List<GameObject> beforeRefreshHiddenObjects;
-
     [SerializeField] private List<TMP_Text> playersText;
 
     [Space][SerializeField] private GameObject fighterSelectorUIObject;
@@ -18,7 +16,6 @@ public class FighterSelectorUI : NetworkBehaviour
     [SerializeField] private GameObject matchUIObject;
 
     [Space][SerializeField] private Button readyButton;
-    [SerializeField] private Button refreshButton;
     [SerializeField] private Button returnButton;
 
     [Space][SerializeField] private TMP_Dropdown fighterSelectorInput;
@@ -41,7 +38,6 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         fighterSelectorUIObject.SetActive(false);
         readyButton.onClick.AddListener(OnReadyButtonPressed);
-        refreshButton.onClick.AddListener(OnRefreshButtonPressed);
         returnButton.onClick.AddListener(OnReturnButtonPressed);
 
         //timeSelectorInput.onValueChanged.AddListener(OnTimeChanged);
@@ -65,10 +61,6 @@ public class FighterSelectorUI : NetworkBehaviour
 
         lobbySelectorUIObject.SetActive(true);
 
-        foreach (var obj in beforeRefreshHiddenObjects)
-        {
-            obj.SetActive(false);
-        }
         timeSelectorInput.gameObject.SetActive(false);
         roundNumberSelectorInput.gameObject.SetActive(false);
 
@@ -90,23 +82,6 @@ public class FighterSelectorUI : NetworkBehaviour
         RefreshServerRpc(clientId, lobbyId);
     }
 
-    //METODO PARA ACTUALIZAR INTERFAZ
-    public void OnRefreshButtonPressed()
-    {
-        RefreshServerRpc(NetworkManager.LocalClientId, -1);
-        foreach (var obj in beforeRefreshHiddenObjects)
-        {
-            obj.SetActive(true);
-        }
-    }
-
-    public void OcultarHiddenObjects()
-    {
-        foreach (var obj in beforeRefreshHiddenObjects)
-        {
-            obj.SetActive(false);
-        }
-    }
 
     //ACTUALIZA LA INTERFAZ DE LOS MIEMBROS DE UNA SALA  --- SI LE PASAS UN LOBBY CONCRETO LO HACE DE ESE LOBBY, SI NO, EL DEL USUARIO QUE LO ENVIA
     [ServerRpc(RequireOwnership = false)]
@@ -116,6 +91,7 @@ public class FighterSelectorUI : NetworkBehaviour
         //solo el jugador 1 puede modificar las opciones de rondas y tiempo
         if (onlinePlayers.ReturnPlayerInformation(clientId).IdInLobby == 0)
         {
+            Debug.Log("Hola, voy a hacer refresh server rpc");
             ClientRpcParams clientRpcParams = new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
@@ -183,6 +159,8 @@ public class FighterSelectorUI : NetworkBehaviour
         timeSelectorInput.gameObject.SetActive(true);
         roundNumberSelectorInput.gameObject.SetActive(true);
     }
+
+
 
     // CUANDO EL JUGADOR ESTE LISTO PULSARA ESTE BOTON, Y SE HARA LA GESTION DE JUGADORES LISTOS PARA SPAWNEAR PERSONAJES Y EMPEZAR LA PARTIDA
     public void OnReadyButtonPressed()
@@ -263,8 +241,14 @@ public class FighterSelectorUI : NetworkBehaviour
     [ClientRpc]
     public void StartGameClientRpc(ClientRpcParams clientRpcParams = default)
     {
+        OcultarRoundTimeOptions();
         fighterSelectorUIObject.SetActive(false);
         matchUIObject.SetActive(true);
+    }
+    public void OcultarRoundTimeOptions()
+    {
+        timeSelectorInput.gameObject.SetActive(false);
+        roundNumberSelectorInput.gameObject.SetActive(false);
     }
 
     public void OnTimeChanged(int value)

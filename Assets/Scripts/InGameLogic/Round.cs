@@ -218,7 +218,7 @@ public class Round
 
         foreach (var player in fighters_alive)
         {
-            player.GetComponent<HealthManager>().Reset();
+            player.GetComponent<HealthManager>().ResetHealth();
         }
         foreach (var player in fighters_dead)
         {

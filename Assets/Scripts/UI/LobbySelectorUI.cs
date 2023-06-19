@@ -21,8 +21,6 @@ public class LobbySelectorUI : NetworkBehaviour
 
     private LobbyManager lobbyManager;
 
-    private FighterSelectorUI fighterSelector;
-
     private void Start()
     {
         lobbySelectorUIObject.SetActive(false);
@@ -37,8 +35,6 @@ public class LobbySelectorUI : NetworkBehaviour
 
         lobbyManager = GameObject.FindWithTag("Game Manager").GetComponent<LobbyManager>();
         if (lobbyManager == null) Debug.Log("LOBBY MANAGER NO ENCONTRAO");
-
-        fighterSelector = GetComponent<FighterSelectorUI>();
     }
 
 
@@ -50,22 +46,25 @@ public class LobbySelectorUI : NetworkBehaviour
     public void OnJoin0Pressed()
     {
         AddClientToLobbyServerRpc(0, NetworkManager.LocalClientId);
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
     }
 
     public void OnJoin1Pressed()
     {
         AddClientToLobbyServerRpc(1, NetworkManager.LocalClientId);
-
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
     }
 
     public void OnJoin2Pressed()
     {
         AddClientToLobbyServerRpc(2, NetworkManager.LocalClientId);
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
     }
 
     public void OnJoin3Pressed()
     {
         AddClientToLobbyServerRpc(3, NetworkManager.LocalClientId);
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
     }
 
     //METODO QUE UNE A JUGADOR A SALA Y ACTUALIZA INTERFAZ DE TODOS
@@ -87,7 +86,7 @@ public class LobbySelectorUI : NetworkBehaviour
             }
         };
 
-        ChangeToFighterSelectorCLientRpc(lobbyIndex, clientRpcParams);
+        ChangeToFighterSelectorCLientRpc(clientRpcParams);
 
 
         for (int i = 0; i < lobbyManager.Lobbies.Count; i++)
@@ -97,19 +96,17 @@ public class LobbySelectorUI : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void ChangeToFighterSelectorCLientRpc(int lobbyIndex, ClientRpcParams clientRpcParams = default)
+    public void ChangeToFighterSelectorCLientRpc(ClientRpcParams clientRpcParams = default)
     {
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
-
-        fighterSelector.RefreshServerRpc(NetworkManager.LocalClientId, lobbyIndex);
-        
     }
 
     public void OnCreateLobbyPressed()
     {
         CreateLobbyServerRpc(NetworkManager.LocalClientId);
         Debug.Log("CLIENTE: quiero crear sala");
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
         lobbySelectorUIObject.SetActive(false);
         fighterSelectorUIObject.SetActive(true);
     }

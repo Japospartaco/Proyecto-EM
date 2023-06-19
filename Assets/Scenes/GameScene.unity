@@ -1310,7 +1310,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &173575306
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2973,7 +2973,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &371802507
 Transform:
   m_ObjectHideFlags: 0
@@ -3265,7 +3265,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &421261034
 Transform:
   m_ObjectHideFlags: 0
@@ -3308,7 +3308,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &424580458
 Transform:
   m_ObjectHideFlags: 0
@@ -4876,7 +4876,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &695486425
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4998,7 +4998,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &711997382
 Transform:
   m_ObjectHideFlags: 0
@@ -5543,7 +5543,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &740799107
 Transform:
   m_ObjectHideFlags: 0
@@ -6390,7 +6390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &811145709
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7799,7 +7799,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &972108943
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7834,7 +7834,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.270038, g: 0.8, b: 0.22352938, a: 0.38431373}
+  m_Color: {r: 0.9676024, g: 1, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -9639,7 +9639,7 @@ GameObject:
   - component: {fileID: 1044673576}
   - component: {fileID: 1044673575}
   m_Layer: 5
-  m_Name: Button_Volver a jugar
+  m_Name: Button ReturnLobbySelector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10592,7 +10592,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1121565257
 Transform:
   m_ObjectHideFlags: 0
@@ -16766,7 +16766,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Volver a jugar
+  m_text: Seleccion de lobby
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce8764ef488a4ca4ba6ec918ae94fbc7, type: 2}
   m_sharedMaterial: {fileID: -8591073183968212456, guid: ce8764ef488a4ca4ba6ec918ae94fbc7, type: 2}
@@ -16793,8 +16793,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15
-  m_fontSizeBase: 15
+  m_fontSize: 13.91
+  m_fontSizeBase: 13.91
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -18022,7 +18022,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1317288918
 Transform:
   m_ObjectHideFlags: 0
@@ -21275,7 +21275,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1448003291
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21445,7 +21445,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1491136931
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21750,7 +21750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1519996841
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21785,7 +21785,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7516798, g: 0.8, b: 0.22352938, a: 0.38431373}
+  m_Color: {r: 0, g: 1, b: 0.089500666, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -21956,7 +21956,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -26.6}
+  m_AnchoredPosition: {x: 0, y: -24.3}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1537040499
@@ -22539,7 +22539,7 @@ GameObject:
   - component: {fileID: 1590775238}
   - component: {fileID: 1590775237}
   m_Layer: 5
-  m_Name: Button_Salir del juego
+  m_Name: Button ReturnFighterSelector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23912,6 +23912,14 @@ MonoBehaviour:
   FighterSelectorUIObject: {fileID: 2025362546}
   usernameInput: {fileID: 96445266}
   logInButton: {fileID: 509320873}
+  gameObjectsToShow:
+  - {fileID: 424580457}
+  - {fileID: 421261033}
+  - {fileID: 1121565256}
+  - {fileID: 711997381}
+  - {fileID: 1317288917}
+  - {fileID: 740799106}
+  - {fileID: 371802506}
 --- !u!114 &1769254127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24056,6 +24064,7 @@ MonoBehaviour:
   matchUI: {fileID: 811145708}
   postMatchUI: {fileID: 1880690262}
   lobbySelectorUI: {fileID: 173575305}
+  fighterSelectorUI: {fileID: 2025362546}
   playersUI:
   - {fileID: 933601103}
   - {fileID: 1773060825}
@@ -24077,8 +24086,8 @@ MonoBehaviour:
   - {fileID: 368568607}
   - {fileID: 727217021}
   winnerInformation: {fileID: 501092527}
-  buttonVolverAJugar: {fileID: 1044673575}
-  buttonSalirDelJuego: {fileID: 1590775237}
+  buttonReturnLobbySelector: {fileID: 1044673575}
+  buttonReturnFighterSelector: {fileID: 1590775237}
   onlinePlayers: {fileID: 476110322}
   lobbyManager: {fileID: 476110321}
   matchManager: {fileID: 476110323}
@@ -24556,7 +24565,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Salir del juego
+  m_text: Vuelta al Lobby
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce8764ef488a4ca4ba6ec918ae94fbc7, type: 2}
   m_sharedMaterial: {fileID: -8591073183968212456, guid: ce8764ef488a4ca4ba6ec918ae94fbc7, type: 2}
@@ -25520,7 +25529,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1909338043
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25555,7 +25564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.22352938, g: 0.24857986, b: 0.8, a: 0.38431373}
+  m_Color: {r: 0.054901954, g: 0.15407509, b: 0.8901961, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -26269,7 +26278,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2005797056
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26304,7 +26313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8018868, g: 0.22316661, b: 0.22316661, a: 0.38431373}
+  m_Color: {r: 1, g: 0.504717, b: 0.504717, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

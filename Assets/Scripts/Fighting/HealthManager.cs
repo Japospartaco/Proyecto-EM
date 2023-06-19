@@ -17,8 +17,9 @@ public class HealthManager : MonoBehaviour
 
     //EVENTOS
     //public DmgEvent DmgTaken = new DmgEvent();
-    //public EventHandler<bool> Dead;
-    public EventHandler<GameObject> DmgTaken;
+    public EventHandler<GameObject> ResetHealthEvent;
+    public EventHandler<GameObject> DmgTakenEvent;
+    public EventHandler<GameObject> DeadEvent;
 
     private void Start()
     {
@@ -26,26 +27,27 @@ public class HealthManager : MonoBehaviour
         if (!character)
         {
             Debug.Log("ERROR EN CHARACTER_HEALTH: NO HAY PERSONAJE");
-            Reset();
+            ResetHealth();
         }
     }
 
-    public void Reset()
+    public void ResetHealth()
     {
         healthPoints = maxHealth;
+        ResetHealthEvent?.Invoke(this, gameObject);
     }
 
     public void TakeDmg(int dmg)
     {
         healthPoints -= dmg;
-        DmgTaken?.Invoke(this, gameObject); //DESDE AQUI QUIERO ACTUALIZAR LAS VIDAS
+        DmgTakenEvent?.Invoke(this, gameObject); //DESDE AQUI QUIERO ACTUALIZAR LAS VIDAS
         Debug.Log("Me han pegado");
         if (healthPoints <= 0)
         {
             Debug.Log("Me he muerto");
             healthPoints = 0;
             new DieCommand(character).Execute();
-            //Dead?.Invoke(this, false);
+            DeadEvent?.Invoke(this, gameObject);
         }
     }
 }

@@ -178,7 +178,7 @@ namespace Movement.Components
             //gameObject.SetActive(true);
             //Debug.Log(":D");
 
-            gameObject.GetComponent<HealthManager>().Reset();
+            gameObject.GetComponent<HealthManager>().ResetHealth();
             gameObject.SetActive(true);
 
             ReviveClientRpc(clientRpcParams);
