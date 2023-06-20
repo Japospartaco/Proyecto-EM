@@ -12,6 +12,7 @@ public class Lobby
     private bool isStarted = false;
     private int roundNumber = 1;
     private int roundTime = 5;
+    private string password = "";
 
 
     private List<PlayerInformation> playersInformation = new();
@@ -69,6 +70,11 @@ public class Lobby
         set { roundTime = value; }
     }
 
+    public string Password
+    {
+        get { return password; }
+    }
+
 
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
     {
@@ -82,6 +88,19 @@ public class Lobby
         this.onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
 
 
+    }
+
+    public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager, string password)
+    {
+        creator.IdInLobby = 0;
+        creator.CurrentLobbyId = idLobby;
+        playersInformation.Add(creator);
+        this.isPrivate = true;
+
+        this.lobbyId = idLobby;
+        this.lobbyManager = lobbyManager;
+        this.onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
+        this.password = password;
     }
 
     /*

@@ -17,8 +17,11 @@ public class LobbySelectorUI : NetworkBehaviour
     [SerializeField] private List<TMP_Text> joinButtonTexts;
     [SerializeField] private List<TMP_Text> numPlayerstexts;
 
-    [SerializeField] private Button createLobbyButton;
+    [SerializeField] private Button createPublicLobbyButton;
+    [SerializeField] private Button createPrivateLobbyButton;
     [SerializeField] private Button refreshButton;
+
+    [SerializeField] private TMP_InputField passwordInputField;
 
     private LobbyManager lobbyManager;
 
@@ -31,7 +34,8 @@ public class LobbySelectorUI : NetworkBehaviour
         joinButtons[2].onClick.AddListener(OnJoin2Pressed);
         joinButtons[3].onClick.AddListener(OnJoin3Pressed);
 
-        createLobbyButton.onClick.AddListener(OnCreateLobbyPressed);
+        createPublicLobbyButton.onClick.AddListener(OnCreatePublicLobbyPressed);
+        createPrivateLobbyButton.onClick.AddListener(OnCreatePrivateLobbyPressed);
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
 
         lobbyManager = GameObject.FindWithTag("Game Manager").GetComponent<LobbyManager>();
@@ -46,38 +50,42 @@ public class LobbySelectorUI : NetworkBehaviour
 
     public void OnJoin0Pressed()
     {
-        AddClientToLobbyServerRpc(0, NetworkManager.LocalClientId);
-        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
+        AddClientToLobbyServerRpc(0, NetworkManager.LocalClientId, passwordInputField.text);
+       
     }
 
     public void OnJoin1Pressed()
     {
-        AddClientToLobbyServerRpc(1, NetworkManager.LocalClientId);
-        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
+        AddClientToLobbyServerRpc(1, NetworkManager.LocalClientId, passwordInputField.text);
+        
     }
 
     public void OnJoin2Pressed()
     {
-        AddClientToLobbyServerRpc(2, NetworkManager.LocalClientId);
-        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
+        AddClientToLobbyServerRpc(2, NetworkManager.LocalClientId, passwordInputField.text);
+        
     }
 
     public void OnJoin3Pressed()
     {
-        AddClientToLobbyServerRpc(3, NetworkManager.LocalClientId);
-        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
+        AddClientToLobbyServerRpc(3, NetworkManager.LocalClientId, passwordInputField.text);
     }
 
     //METODO QUE UNE A JUGADOR A SALA Y ACTUALIZA INTERFAZ DE TODOS
     [ServerRpc(RequireOwnership = false)]
-    public void AddClientToLobbyServerRpc(int lobbyIndex, ulong clientId)
+    public void AddClientToLobbyServerRpc(int lobbyIndex, ulong clientId, string password)
     {
         if (lobbyManager.GetLobbyFromId(lobbyIndex).IsStarted) return;
 
-        if (lobbyManager.GetLobbyFromId(lobbyIndex).IsPrivate) return;
-        //AQUI SE IMPLEMENTARIA UN POP UP PARA ACCEDER A LA SALA O GESTION DE PARTIDAS PRIVADAS
+        if (lobbyManager.GetLobbyFromId(lobbyIndex).IsPrivate)
+        {
+            Debug.Log("contraseña invalida");
+            if (password != lobbyManager.GetLobbyFromId(lobbyIndex).Password) return;
+        }
 
-        lobbyManager.AddPlayerToLobby(lobbyIndex, clientId);
+
+        if (!lobbyManager.AddPlayerToLobby(lobbyIndex, clientId))
+            return;
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -103,12 +111,24 @@ public class LobbySelectorUI : NetworkBehaviour
         fighterSelectorUIObject.SetActive(true);
         chatUIObject.SetActive(true);
         GetComponent<ChatUI>().ResetChat();
+        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
     }
 
-    public void OnCreateLobbyPressed()
+    public void OnCreatePublicLobbyPressed()
     {
-        CreateLobbyServerRpc(NetworkManager.LocalClientId);
-        Debug.Log("CLIENTE: quiero crear sala");
+        CreateLobbyServerRpc(NetworkManager.LocalClientId, false);
+        Debug.Log("CLIENTE: quiero crear sala PUBLICA");
+    }
+
+    public void OnCreatePrivateLobbyPressed()
+    {
+        CreateLobbyServerRpc(NetworkManager.LocalClientId, true);
+        Debug.Log("CLIENTE: quiero crear sala PRIVADA");
+    }
+
+    [ClientRpc]
+    public void EnterLobbyClientRpc(ClientRpcParams clientRpcParams = default)
+    {
         GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
         lobbySelectorUIObject.SetActive(false);
         chatUIObject.SetActive(true);
@@ -143,10 +163,22 @@ public class LobbySelectorUI : NetworkBehaviour
 
     //METODO QUE CREA LOBBY Y ACTUALIZA INTERFAZ DE TODOS
     [ServerRpc(RequireOwnership = false)]
-    public void CreateLobbyServerRpc(ulong clientId)
+    public void CreateLobbyServerRpc(ulong clientId, bool isPrivate)
     {
         Debug.Log("SERVER: creando sala");
-        lobbyManager.CreateLobby(clientId);
+        if (!lobbyManager.CreateLobby(clientId, isPrivate, passwordInputField.text))
+        {
+            return;
+        }
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientId }
+            }
+        };
+        EnterLobbyClientRpc(clientRpcParams);
         Debug.Log("SERVER: num de salas actual: " + lobbyManager.Lobbies.Count);
 
         for (int i = 0; i < lobbyManager.Lobbies.Count; i++)

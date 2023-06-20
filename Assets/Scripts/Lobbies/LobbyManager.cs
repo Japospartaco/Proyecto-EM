@@ -20,27 +20,41 @@ public class LobbyManager : NetworkBehaviour
 
 
     //METODO PARA CREAR UNA SALA SABIENDO EL ID DEL CREADOR
-    public void CreateLobby(ulong creatorId)
+    public bool CreateLobby(ulong creatorId, bool isPrivate, string password)
     {
         if (!IsServer)
         {
             Debug.Log("CLIENTE: no soy el server");
-            return;
+            return false;
         }
-        if (lobbies.Count >= MAX_LOBBIES) return;
+
+        if (lobbies.Count >= MAX_LOBBIES) return false;
+
+
         Debug.Log("SERVER: HASTA AQUI LLEGO");
         onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
         PlayerInformation creatorInformation = onlinePlayers.ReturnPlayerInformation(creatorId);
-        Lobby lobby = new Lobby(creatorInformation, nextLobbyId, this);
+
+        Lobby lobby;
+        if (isPrivate)
+        {
+            lobby = new Lobby(creatorInformation, nextLobbyId, this, password);
+        }
+        else
+        {
+            lobby = new Lobby(creatorInformation, nextLobbyId, this);
+        }
+
         lobbies.Add(lobby);
         nextLobbyId++;
+        return true;
     }
 
-    public void AddPlayerToLobby(int indexInList, ulong playerId)
+    public bool AddPlayerToLobby(int indexInList, ulong playerId)
     {
-        if (!IsServer) return;
-        if (!lobbies[indexInList].AddPlayerToLobby(playerId))
-            Debug.Log("NO SE PUDO AÑADIR JUGADOR");
+        if (!IsServer) return false;
+        return lobbies[indexInList].AddPlayerToLobby(playerId);
+
     }
 
     //ELIMINAR LOBBY POR SU ID
@@ -69,9 +83,9 @@ public class LobbyManager : NetworkBehaviour
         return onlinePlayers.ReturnPlayerInformation(playerId).CurrentLobbyId;
     }
 
-    public Lobby GetLobbyFromId (int lobbyId)
+    public Lobby GetLobbyFromId(int lobbyId)
     {
-        foreach(var lob in lobbies)
+        foreach (var lob in lobbies)
         {
             if (lob.LobbyId == lobbyId)
                 return lob;
