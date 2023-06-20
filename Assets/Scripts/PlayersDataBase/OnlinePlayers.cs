@@ -11,9 +11,31 @@ public class OnlinePlayers : NetworkBehaviour
 
     private Dictionary<ulong, GameObject> onlinePlayers = new();
 
+    public Dictionary<ulong, GameObject> OnlinePlayersDictionary
+    {
+        get { return onlinePlayers; }
+    }
+
     private void Start()
     {
         NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
+    }
+
+    public List<NetworkObject> ReturnNetworkObjectList()
+    {
+        List<NetworkObject> networkObjectList = new List<NetworkObject>();
+
+        foreach (var id in onlinePlayers.Keys)
+        {
+            GameObject fighter = onlinePlayers[id].GetComponent<PlayerInformation>().FighterObject;
+            if (fighter != null)
+            {
+                NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
+                networkObjectList.Add(networkObject);
+            }
+        }
+
+        return networkObjectList;
     }
 
     public void AddPlayer(ulong id, GameObject player)
@@ -87,8 +109,11 @@ public class OnlinePlayers : NetworkBehaviour
             }
             else Debug.Log("PERSONAJE NO ENCONETRADO");
         }
-        else lobby.RemovePlayerFromLobby(clientId);
-
+        else
+        {
+            lobby.RemovePlayerFromLobby(clientId);
+            onlinePlayers.Remove(clientId);
+        }
     }
 
 

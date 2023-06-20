@@ -9,5 +9,7 @@ namespace Movement.Components
         public void TakeHit(int dmg);
         public void Die();
         public void Revive(ClientRpcParams clientRpcParams);
+
+        public void ActivateCharacter(ulong clientId);
     }
 }

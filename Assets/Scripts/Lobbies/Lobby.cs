@@ -181,6 +181,10 @@ public class Lobby
         {
             Debug.Log("Eliminando de la lobby a: " + player.Username);
             player.ResetAfterExitingLobby();
+            if (player.FighterObject.GetComponent<FighterInformation>().IsDisconnected)
+            {
+                onlinePlayers.OnlinePlayersDictionary.Remove(player.Id);
+            }
         }
 
         readyPlayers.Clear();

@@ -4,8 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-
-
+using Movement.Components;
 
 public class FighterSelectorUI : NetworkBehaviour
 {
@@ -28,6 +27,9 @@ public class FighterSelectorUI : NetworkBehaviour
 
     [SerializeField] private TMP_Dropdown timeSelectorInput;
     [SerializeField] private int[] timeOptions;
+
+    [Space]
+    [SerializeField] List<LayerMask> layerLobbies;
 
     
 
@@ -202,19 +204,6 @@ public class FighterSelectorUI : NetworkBehaviour
             transformIniciales.Add(initPos.transform.GetChild(i));
         }
 
-        for (int i = 0; i < lobby.PlayersList.Count; i++)
-        {
-            PlayerInformation player = lobby.PlayersList[i];
-            InstantiateCharacter(player.Id, player.SelectedFighter, transformIniciales[i]);
-        }
-
-        int n_rounds = lobby.RoundNumber;
-        int time_per_round = lobby.RoundTime;
-
-        Debug.Log("Quiero empezar la partida");
-        Debug.Log($"NUMERO DE RONDAS: {n_rounds}");
-        Debug.Log($"TIEMPO POR RONDA: {time_per_round}");
-
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
@@ -223,13 +212,28 @@ public class FighterSelectorUI : NetworkBehaviour
             }
         };
 
+
+        int n_rounds = lobby.RoundNumber;
+        int time_per_round = lobby.RoundTime;
+
+        Debug.Log("Quiero empezar la partida");
+        Debug.Log($"NUMERO DE RONDAS: {n_rounds}");
+        Debug.Log($"TIEMPO POR RONDA: {time_per_round}");
+
         StartGameClientRpc(clientRpcParams);
+
+        for (int i = 0; i < lobby.PlayersList.Count; i++)
+        {
+            PlayerInformation player = lobby.PlayersList[i];
+            InstantiateCharacter(lobby, player.Id, player.SelectedFighter, transformIniciales[i], clientRpcParams);
+
+        }
 
         matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager, transformIniciales));
     }
 
 
-    public void InstantiateCharacter(ulong id, int selectedFighter, Transform posInit)
+    public void InstantiateCharacter(Lobby lobby, ulong id, int selectedFighter, Transform posInit, ClientRpcParams clientRpcParams)
     {
         if (!IsServer) return;
         GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter], posInit);
@@ -239,12 +243,52 @@ public class FighterSelectorUI : NetworkBehaviour
         player.GetComponent<PlayerInformation>().FighterObject = characterGameObject;
         characterGameObject.GetComponent<FighterInformation>().Player = player;
 
+        GameObject lobbiesLayersGameObject = GameObject.FindGameObjectWithTag("Lobbies");
+        AssignLayerRecursively(characterGameObject, lobbiesLayersGameObject.transform.GetChild(lobby.LobbyId).gameObject.layer);
+
+        /*
+        switch (lobby.LobbyId)
+        {
+            case 0:
+                AssignLayerRecursively(characterGameObject, lobbiesLayersGameObject.transform.GetChild(0).gameObject.layer);
+                break;
+            case 1:
+                AssignLayerRecursively(characterGameObject, lobbiesLayersGameObject.transform.GetChild(1).gameObject.layer);
+                break;
+            case 2:
+                AssignLayerRecursively(characterGameObject, lobbiesLayersGameObject.transform.GetChild(2).gameObject.layer);
+                break;
+            case 3:
+                AssignLayerRecursively(characterGameObject, lobbiesLayersGameObject.transform.GetChild(3).gameObject.layer);
+                break;
+        }*/
+
         matchManager.AddEventHealthInterface(characterGameObject.GetComponent<HealthManager>());
 
-        characterGameObject.GetComponent<NetworkObject>().SpawnWithOwnership(id);
-        characterGameObject.GetComponent<NetworkObject>().DontDestroyWithOwner = true;
+        NetworkObject networkObject = characterGameObject.GetComponent<NetworkObject>();
+        networkObject.SpawnWithOwnership(id);
+        networkObject.DontDestroyWithOwner = true;
+
+        foreach (var clientId in onlinePlayers.OnlinePlayersDictionary.Keys)
+        {
+            networkObject.NetworkHide(clientId);
+        }
+
         characterGameObject.transform.SetParent(transform, false);
     }
+
+    public void AssignLayerRecursively(GameObject gameObject, int layer)
+    {
+        // Asignar la capa al objeto actual
+        gameObject.layer = layer;
+
+        // Recorrer todos los hijos del objeto actual y asignar la capa de manera recursiva
+        foreach (Transform child in gameObject.transform)
+        {
+            AssignLayerRecursively(child.gameObject, layer);
+        }
+    }
+
 
     [ClientRpc]
     public void StartGameClientRpc(ClientRpcParams clientRpcParams = default)
@@ -254,6 +298,7 @@ public class FighterSelectorUI : NetworkBehaviour
         chatUIObject.SetActive(false);
         matchUIObject.SetActive(true);
     }
+
     public void OcultarRoundTimeOptions()
     {
         timeSelectorInput.gameObject.SetActive(false);

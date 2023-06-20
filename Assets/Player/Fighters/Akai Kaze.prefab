@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: -7635323045006678101}
   - component: {fileID: 1122876454735098746}
   - component: {fileID: 6503605648234694139}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Akai Kaze
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: cdc6c07d510e5124bafb24d711746559, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -147,7 +147,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 1279163059010513274}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: cdc6c07d510e5124bafb24d711746559, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -288,6 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   winnedRounds: 0
+  isDisconnected: 0
 --- !u!1 &1279163059404656106
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,7 +298,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1279163059404656101}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -328,7 +329,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7930650381332327188}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Attacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -363,7 +364,7 @@ GameObject:
   - component: {fileID: 7606685028906649749}
   - component: {fileID: 1194684208166540514}
   - component: {fileID: 5600483238005168429}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: WeaponAttack1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -443,7 +444,7 @@ GameObject:
   - component: {fileID: 8917461478260417039}
   - component: {fileID: 2328692754943562302}
   - component: {fileID: 5399960131320595288}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: WeaponAttack2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

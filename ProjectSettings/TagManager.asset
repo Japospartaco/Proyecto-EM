@@ -12,6 +12,7 @@ TagManager:
   - Canvas
   - Clock UI
   - Network Manager
+  - Lobbies
   layers:
   - Default
   - TransparentFX
@@ -19,10 +20,10 @@ TagManager:
   - Floor
   - Water
   - UI
-  - Fighter
-  - FighterFeet
-  - Weapon
-  - 
+  - Lobby 1
+  - Lobby 2
+  - Lobby 3
+  - Lobby 4
   - 
   - 
   - 

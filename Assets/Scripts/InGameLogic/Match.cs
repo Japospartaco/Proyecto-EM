@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using Movement.Components;
 
 public class Match
 {
@@ -54,7 +55,28 @@ public class Match
 	{
         Debug.Log("He empezado la partida.");
         idLobby = lobby.LobbyId;
-        players = lobby.PlayersList;    
+        players = lobby.PlayersList;
+
+        clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobby.GetPlayersIdsList()
+            }
+        };
+
+        for(int i = 0; i < players.Count; i++)
+        {
+            GameObject fighter = players[i].FighterObject;
+            for (int j = 0; j < players.Count; j++)
+            {
+                new ActivateCharacterCommand(fighter.GetComponent<FighterMovement>()).Execute(players[j].Id);
+            }
+        }
+
+        foreach (var player in players)
+        {
+        }
 
         this.lobby = lobby;
 

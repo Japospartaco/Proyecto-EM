@@ -19,5 +19,10 @@ namespace Movement.Commands
             throw new System.NotImplementedException();
 
         }
+
+        public override void Execute(ulong clientId)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

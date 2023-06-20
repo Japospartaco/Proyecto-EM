@@ -21,5 +21,10 @@ namespace Movement.Commands
             Debug.Log("Intentando acceder al comando revivir.");
             Client.Revive(clientRpcParams);
         }
+
+        public override void Execute(ulong clientId)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

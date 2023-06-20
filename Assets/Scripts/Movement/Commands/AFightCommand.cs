@@ -14,6 +14,8 @@ namespace Movement.Commands
 
         public abstract void Execute();
 
+        public abstract void Execute(ulong clientId);
+
         public abstract void Execute(ClientRpcParams clientRpcParams);        
     }
 }

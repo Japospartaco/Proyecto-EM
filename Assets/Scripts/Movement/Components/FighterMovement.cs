@@ -73,7 +73,6 @@ namespace Movement.Components
             {
                 dashed=false;
             }
-            
             if (_rigidbody2D.velocity.magnitude > 90)
             {
                 dashed = true;
@@ -233,9 +232,8 @@ namespace Movement.Components
         public void DesactivateCharacter()
 		{
             if (!IsServer) return;
-            string text = ($"\t{GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>().Username}: Intentando resucitar...");
 
-            DesactivateCharacterClientRpc(text);
+            DesactivateCharacterClientRpc();
 
             Debug.Log("Llamando al evento de morir");
             gameObject.SetActive(false);
@@ -243,37 +241,33 @@ namespace Movement.Components
         }
 
         [ClientRpc]
-        public void DesactivateCharacterClientRpc(string text,  ClientRpcParams clientRpcParams = default)
+        public void DesactivateCharacterClientRpc(ClientRpcParams clientRpcParams = default)
         {
-            Debug.Log($"ESTOY EN MORIR: {NetworkManager.LocalClientId}{text}");
-            Debug.Log($"\tMatando al cliente {gameObject.activeSelf}");
+
             gameObject.SetActive(false);
-            Debug.Log($"\tCliente matado: {gameObject.activeSelf}");
             EsperandoResucitar.Release();
 
         }
 
         public void Revive(ClientRpcParams clientRpcParams)
         {
-            string text =($"\t{GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>().Username}: Intentando resucitar...");
-
-            ReviveClientRpc(text, clientRpcParams);
+            ReviveClientRpc(clientRpcParams);
 
             gameObject.GetComponent<HealthManager>().ResetHealth();
             gameObject.SetActive(true);
         }
 
         [ClientRpc]
-        void ReviveClientRpc(string text, ClientRpcParams clientRpcParams = default)
+        void ReviveClientRpc(ClientRpcParams clientRpcParams = default)
         {
             EsperandoResucitar.Wait();
-            Debug.Log($"ESTOY EN RESUCITAR: {NetworkManager.LocalClientId}{text}");
-            Debug.Log($"\tPreresucitar: {gameObject.activeSelf}");
-            gameObject.SetActive(true);
-            Debug.Log($"\tPostresucitar: {gameObject.activeSelf}");
 
+            gameObject.SetActive(true);
         }
 
-
+        public void ActivateCharacter(ulong clientId)
+        {
+            gameObject.GetComponent<NetworkObject>().NetworkShow(clientId);
+        }
     }
 }
