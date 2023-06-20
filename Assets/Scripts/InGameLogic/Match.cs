@@ -8,7 +8,7 @@ public class Match
 {
     Lobby lobby;
     ClientRpcParams clientRpcParams;
-    List<Vector3> posicionesIniciales = new List<Vector3>();
+    List<Vector3> posicionesIniciales = new();
 
     List<PlayerInformation> players;
     PlayerInformation player_winner;
@@ -50,7 +50,7 @@ public class Match
         set { idLobby = value; }
 	}
 
-    public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager)
+    public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager, List<Transform> transformIniciales )
 	{
         Debug.Log("He empezado la partida.");
         idLobby = lobby.LobbyId;
@@ -69,13 +69,10 @@ public class Match
 
         current_round = 0;
 
-        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
-
-        for (int i = 0; i < initPos.transform.childCount; i++)
+        foreach(var currentTransform in transformIniciales)
         {
-            posicionesIniciales.Add(initPos.transform.GetChild(i).position);
+            posicionesIniciales.Add(currentTransform.position);
         }
-
         StartRoundFromMatch();
     }
 

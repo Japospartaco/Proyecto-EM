@@ -3,7 +3,6 @@ using Movement.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -59,7 +58,8 @@ public class Round
 
 
             fighter.transform.position = posiciones[contador];
-            fighter.GetComponent<Rigidbody2D>().velocity = new Vector2(1.0f, 0.0f);
+
+            //fighter.GetComponent<Rigidbody2D>().velocity = new Vector2(1.0f, 0.0f);
 
             FighterMovement fighterMovement = fighter.GetComponent<FighterMovement>();
 
@@ -80,7 +80,6 @@ public class Round
 
         this.match = match;
     }
-    
 
     public void StartRound()
     {

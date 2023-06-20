@@ -194,10 +194,20 @@ public class FighterSelectorUI : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        foreach (var player in lobby.PlayersList)
+        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
+        List<Transform> transformIniciales = new List<Transform>();
+
+        for (int i = 0; i < initPos.transform.childCount; i++)
         {
-            InstantiateCharacter(player.Id, player.SelectedFighter);
+            transformIniciales.Add(initPos.transform.GetChild(i));
         }
+
+        for (int i = 0; i < lobby.PlayersList.Count; i++)
+        {
+            PlayerInformation player = lobby.PlayersList[i];
+            InstantiateCharacter(player.Id, player.SelectedFighter, transformIniciales[i]);
+        }
+
         int n_rounds = lobby.RoundNumber;
         int time_per_round = lobby.RoundTime;
 
@@ -215,14 +225,14 @@ public class FighterSelectorUI : NetworkBehaviour
 
         StartGameClientRpc(clientRpcParams);
 
-        matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager));
+        matchManager.AddMatch(new Match(lobby, n_rounds, time_per_round, matchManager, transformIniciales));
     }
 
 
-    public void InstantiateCharacter(ulong id, int selectedFighter)
+    public void InstantiateCharacter(ulong id, int selectedFighter, Transform posInit)
     {
         if (!IsServer) return;
-        GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter]);
+        GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter], posInit);
 
         //ASIGNAMOS EL PERSONAJE CREADO AL "PLAYER INFORMATION" DE SU DUE�O
         GameObject player = onlinePlayers.ReturnPlayerGameObject(id);

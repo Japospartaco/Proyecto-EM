@@ -38,6 +38,8 @@ namespace Movement.Components
 
         public EventHandler<GameObject> DieEvent;
 
+        public SemaphoreSlim EsperandoResucitar = new SemaphoreSlim(0);
+
         public bool AllowedMovement
 		{
             get { return allowedMovement; }
@@ -230,27 +232,46 @@ namespace Movement.Components
 
         public void DesactivateCharacter()
 		{
-            Debug.Log("Desactivando al cliente");
-            gameObject.SetActive(false);
-
             if (!IsServer) return;
+            string text = ($"\t{GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>().Username}: Intentando resucitar...");
+
+            DesactivateCharacterClientRpc(text);
+
             Debug.Log("Llamando al evento de morir");
+            gameObject.SetActive(false);
             DieEvent?.Invoke(this, gameObject);
+        }
+
+        [ClientRpc]
+        public void DesactivateCharacterClientRpc(string text,  ClientRpcParams clientRpcParams = default)
+        {
+            Debug.Log($"ESTOY EN MORIR: {NetworkManager.LocalClientId}{text}");
+            Debug.Log($"\tMatando al cliente {gameObject.activeSelf}");
+            gameObject.SetActive(false);
+            Debug.Log($"\tCliente matado: {gameObject.activeSelf}");
+            EsperandoResucitar.Release();
+
         }
 
         public void Revive(ClientRpcParams clientRpcParams)
         {
-            ReviveClientRpc(clientRpcParams);
+            string text =($"\t{GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>().Username}: Intentando resucitar...");
+
+            ReviveClientRpc(text, clientRpcParams);
 
             gameObject.GetComponent<HealthManager>().ResetHealth();
             gameObject.SetActive(true);
         }
 
         [ClientRpc]
-        void ReviveClientRpc(ClientRpcParams clientRpcParams = default)
+        void ReviveClientRpc(string text, ClientRpcParams clientRpcParams = default)
         {
-            Debug.Log("Intentando resucitar...");
+            EsperandoResucitar.Wait();
+            Debug.Log($"ESTOY EN RESUCITAR: {NetworkManager.LocalClientId}{text}");
+            Debug.Log($"\tPreresucitar: {gameObject.activeSelf}");
             gameObject.SetActive(true);
+            Debug.Log($"\tPostresucitar: {gameObject.activeSelf}");
+
         }
 
 
