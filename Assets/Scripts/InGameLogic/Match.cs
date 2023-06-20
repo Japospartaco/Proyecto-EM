@@ -8,6 +8,7 @@ public class Match
 {
     Lobby lobby;
     ClientRpcParams clientRpcParams;
+    List<Vector3> posicionesIniciales = new List<Vector3>();
 
     List<PlayerInformation> players;
     PlayerInformation player_winner;
@@ -68,12 +69,19 @@ public class Match
 
         current_round = 0;
 
+        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
+
+        for (int i = 0; i < initPos.transform.childCount; i++)
+        {
+            posicionesIniciales.Add(initPos.transform.GetChild(i).position);
+        }
+
         StartRoundFromMatch();
     }
 
     void StartRoundFromMatch()
 	{
-        Round round = new Round(this, players, time_per_round);
+        Round round = new Round(this, players, time_per_round, posicionesIniciales);
 
         playing_round = round;
 
@@ -145,23 +153,11 @@ public class Match
                     max_ganadas = ganadas;
                     winner = player;    //EN CASO DE QUE NO VAYA, COMENTAR ESTA LINEA Y DESCOMENTAR EL CHORIZO DE ABAJO
                 }
+            } else
+            {
+                Debug.Log("Jugador desconectado");
             }
         }
-
-        /*foreach (var player in players)
-        {
-            FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
-
-            if (!fighterInformation.IsDisconnected)
-            {
-                int ganadas = fighterInformation.WinnedRounds;
-
-                if (max_ganadas == ganadas)
-                {
-                    winner = player;
-                }
-            }
-        }*/
 
         return winner;
 	}

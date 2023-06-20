@@ -3,6 +3,7 @@ using Movement.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -46,20 +47,19 @@ public class Round
     }
 
 
-    public Round(Match match, List<PlayerInformation> players, float time_per_round)
+    public Round(Match match, List<PlayerInformation> players, float time_per_round, List<Vector3> posiciones)
     {
         Debug.Log("Ronda creada :D");
         this.players = players;
-
-        GameObject initPos = GameObject.FindGameObjectWithTag("Spawn positions");
 
         int contador = 0;
         foreach (var player in players)
         {
             GameObject fighter = player.FighterObject;
-            Vector3 InitPos = initPos.transform.GetChild(contador).position;
 
-            fighter.transform.position = InitPos;
+
+            fighter.transform.position = posiciones[contador];
+            fighter.GetComponent<Rigidbody2D>().velocity = new Vector2(1.0f, 0.0f);
 
             FighterMovement fighterMovement = fighter.GetComponent<FighterMovement>();
 
@@ -71,7 +71,6 @@ public class Round
             contador++;
         }
 
-
         this.time_per_round = time_per_round;
         timer = new CountdownTimer(PRE_TIMER, this);
 
@@ -81,6 +80,7 @@ public class Round
 
         this.match = match;
     }
+    
 
     public void StartRound()
     {
@@ -116,7 +116,6 @@ public class Round
 
         if (fighters_alive.Count == 1)
             EndRoundByLastOne();
-
     }
 
     private void EndRoundByTimer(object sender, EventArgs e)
@@ -243,7 +242,10 @@ public class Round
 
             //Si DoNotResuscitate es true no se revive al personaje
             if (!player.GetComponent<FighterInformation>().IsDisconnected)
+            {
+                Debug.Log("Jugador NO desconectado. Intentando revivir.");
                 new ReviveCommand(player.GetComponent<FighterMovement>()).Execute(clientRpcParams);
+            }
         }
     }
 

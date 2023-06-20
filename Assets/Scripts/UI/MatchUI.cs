@@ -92,6 +92,8 @@ public class MatchUI : NetworkBehaviour
             string health = $"{healthManager.healthPoints}/{healthManager.maxHealth}";
             int selectedFighter = player.SelectedFighter;
 
+            Debug.Log($"SERVIDOR: Inicializando la UI de {user}, con {health} vida y {selectedFighter} personajes seleccionado.");
+
             InitializeUIHealthClientRpc(i, user, health, selectedFighter, clientRpcParams);
         }
 
@@ -100,6 +102,9 @@ public class MatchUI : NetworkBehaviour
     [ClientRpc]
     void InitializeUIHealthClientRpc(int index, string user, string health, int selectedFighter, ClientRpcParams clientRpcParams = default)
     {
+        playerContainerList[index].GetComponent<Image>().color = originalColorList[index];
+        playerImageList[index].color = Color.white;
+
         playerContainerList[index].SetActive(true);
         playerImageList[index].sprite = fighterIcons[selectedFighter];
         playerUsernameList[index].text = user;
@@ -153,7 +158,6 @@ public class MatchUI : NetworkBehaviour
     public void UpdateDeadHealthClientRpc(string text, int idInLobby, ClientRpcParams clientRpcParams = default)
     {
         playerContainerList[idInLobby].GetComponent<Image>().color = colorDeath;
-
         playerImageList[idInLobby].color = Color.black;
 
 
@@ -223,7 +227,10 @@ public class MatchUI : NetworkBehaviour
             }
         };
 
-        DesactivateUIContainersClientRpc(match.Lobby.PlayersList.Count);
+        for(int i = 0; i < match.Lobby.PlayersList.Count;i++)
+        {
+            DesactivateUIContainersClientRpc(i, clientRpcParams);
+        }
         UpdateEndUIClientRpc(clientRpcParams);
 
         postMatchUIScript.ComputeInterfaces(match);
@@ -238,12 +245,9 @@ public class MatchUI : NetworkBehaviour
     }
 
     [ClientRpc]
-    void DesactivateUIContainersClientRpc(int n, ClientRpcParams clientRpcParams = default)
+    void DesactivateUIContainersClientRpc(int index, ClientRpcParams clientRpcParams = default)
     {
-        for (int i = 0; i < n; i++)
-        {
-            playerContainerList[i].SetActive(false);
-        }
+         playerContainerList[index].SetActive(false);
     }
 
 

@@ -38,7 +38,7 @@ public class PostMatchUI : NetworkBehaviour
     [SerializeField] LobbyManager lobbyManager;
     [SerializeField] MatchManager matchManager;
 
-    int clientLobbyId;
+    int clientLobbyId = -1;
     //[SerializeField] MatchManager match;
 
     private LobbySelectorUI lobbySelector;
@@ -185,6 +185,12 @@ public class PostMatchUI : NetworkBehaviour
     private void ComputeOnButtonReturnFighterSelectorPressedServerRpc(ulong clientId, int clientLobbyId)
     {
         Debug.Log("SERVIDOR: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
+
+        if (clientLobbyId == -1)
+        {
+            Debug.Log("SERVIDOR: Lobby no encontrada.");
+            return;
+        }
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {

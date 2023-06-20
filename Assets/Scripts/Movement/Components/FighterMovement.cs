@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -57,6 +58,7 @@ namespace Movement.Components
         {
             if (!IsOwner) return;
 
+            
             UpdateServerRpc();
         }
 
@@ -237,19 +239,17 @@ namespace Movement.Components
         }
 
         public void Revive(ClientRpcParams clientRpcParams)
-		{
-            //gameObject.SetActive(true);
-            //Debug.Log(":D");
+        {
+            ReviveClientRpc(clientRpcParams);
 
             gameObject.GetComponent<HealthManager>().ResetHealth();
             gameObject.SetActive(true);
-
-            ReviveClientRpc(clientRpcParams);
         }
 
         [ClientRpc]
         void ReviveClientRpc(ClientRpcParams clientRpcParams = default)
         {
+            Debug.Log("Intentando resucitar...");
             gameObject.SetActive(true);
         }
 

@@ -29,6 +29,7 @@ public class FighterSelectorUI : NetworkBehaviour
     [SerializeField] private TMP_Dropdown timeSelectorInput;
     [SerializeField] private int[] timeOptions;
 
+    
 
     private OnlinePlayers onlinePlayers;
     private LobbyManager lobbyManager;

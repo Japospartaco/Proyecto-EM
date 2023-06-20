@@ -177,31 +177,16 @@ public class Lobby
     public void RemoveAllPlayers()
     {
 
-        while (playersInformation.Count > 0)
+        foreach (var player in playersInformation)
         {
-            RemovePlayerFromLobby(playersInformation[0]);
+            Debug.Log("Eliminando de la lobby a: " + player.Username);
+            player.ResetAfterExitingLobby();
         }
 
         readyPlayers.Clear();
+        playersInformation.Clear();
 
         isStarted = false;
         isPrivate = false;
     }
-
-    public void RemovePlayerFromLobby(PlayerInformation player)
-    {
-
-        //ACTUALIZAR VALOR DE LOS ID EN LOBBY A PARTIR DEL ELIMINADO
-        for (int i = player.IdInLobby + 1; i < playersInformation.Count; i++)
-        {
-            playersInformation[i].IdInLobby--;
-        }
-
-        playersInformation.RemoveAt(player.IdInLobby);
-
-        //PONER POR DEFECTO LOS VALORES DE LOBBY EN PLAYER INFORMATION
-        player.ResetAfterExitingLobby();
-    
-    }
-
 }
