@@ -140,7 +140,7 @@ public class FighterSelectorUI : NetworkBehaviour
         }
     }
 
-    //METODO QUE ACTUALIZA INTERFAZ
+    //METODO QUE ACTUALIZA INTERFAZ EN CLIENTE
     [ClientRpc]
     public void RefreshClientRpc(int i, string text, ClientRpcParams clientRpcParams = default)
     {
@@ -152,6 +152,7 @@ public class FighterSelectorUI : NetworkBehaviour
         }
     }
 
+    //METODO QUE MUESTRA AL JUGADOR 1 LAS OPCIONES DE TIEMPO Y RONDA
     [ClientRpc]
     public void Player1RoundTimeOptionsClientRpc(ClientRpcParams clientRpcParams = default)
     {
@@ -164,10 +165,10 @@ public class FighterSelectorUI : NetworkBehaviour
     // CUANDO EL JUGADOR ESTE LISTO PULSARA ESTE BOTON, Y SE HARA LA GESTION DE JUGADORES LISTOS PARA SPAWNEAR PERSONAJES Y EMPEZAR LA PARTIDA
     public void OnReadyButtonPressed()
     {
-        //IMPLEMENTAR EL SISTEMA DE READYS E INICIAR LA PARTIDA
         PlayerReadyServerRpc(NetworkManager.LocalClientId);
     }
 
+    // GESTION DE READYS E INICIO DE PARTIDA
     [ServerRpc(RequireOwnership = false)]
     public void PlayerReadyServerRpc(ulong playerId)
     {
@@ -190,6 +191,7 @@ public class FighterSelectorUI : NetworkBehaviour
 
 
     //####### METODO QUE COMIENZA LA PARTIDA ############
+    // SE INICIZALIZAN E INSTANCIAN LOS FIGHTERS ASI COMO SE CREA LA PARTIDA Y ASIGNAN VALORES DE TIMEPO Y RONDAS
     private void StartGame(Lobby lobby)
     {
         if (!IsServer) return;
@@ -229,6 +231,7 @@ public class FighterSelectorUI : NetworkBehaviour
     }
 
 
+    // METODO EN SERVER QUE INSTANCIA FIGHTER
     public void InstantiateCharacter(ulong id, int selectedFighter, Transform posInit)
     {
         if (!IsServer) return;
@@ -246,6 +249,7 @@ public class FighterSelectorUI : NetworkBehaviour
         characterGameObject.transform.SetParent(transform, false);
     }
 
+    // ACCIONES NECESARIAS EN CLIENTES PARA EMPEZAR PARTIDA
     [ClientRpc]
     public void StartGameClientRpc(ClientRpcParams clientRpcParams = default)
     {
@@ -254,12 +258,14 @@ public class FighterSelectorUI : NetworkBehaviour
         chatUIObject.SetActive(false);
         matchUIObject.SetActive(true);
     }
+
     public void OcultarRoundTimeOptions()
     {
         timeSelectorInput.gameObject.SetActive(false);
         roundNumberSelectorInput.gameObject.SetActive(false);
     }
 
+    // METODO SUSCRITO AL EVENTO DE VALUE CHANGED DEL TIME INPUT
     public void OnTimeChanged(int value)
     {
         Debug.Log("CLIENTE CAMBIA TIEMPO: " + value);
@@ -276,6 +282,7 @@ public class FighterSelectorUI : NetworkBehaviour
         Debug.Log("SERVER ACTUALIZA TIEMPO: " + lobby.RoundTime);
     }
 
+    // METODO SUSCRITO AL EVENTO DE VALUE CHANGED DEL ROUND INPUT
     public void OnRoundsChanged(int value)
     {
         Debug.Log("CLIENTE CAMBIA RONDA: " + value);
@@ -293,6 +300,7 @@ public class FighterSelectorUI : NetworkBehaviour
         Debug.Log("SERVER ACTUALIZA RONDAS: " + lobby.RoundNumber);
     }
 
+    // METODO SUSCRITO AL EVENTO DE VALUE CHANGED DEL FIGHTER INPUT
     public void OnCharacterChanged(int value)
     { 
         Debug.Log("CLIENTE CAMBIA Personaje: " + value);

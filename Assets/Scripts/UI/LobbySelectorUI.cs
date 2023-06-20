@@ -104,6 +104,7 @@ public class LobbySelectorUI : NetworkBehaviour
         }
     }
 
+    //METODO QUE REALIZA LOS PASOS NECESARIOS EN LOS CLIENTES PARA ENTRAR AL SELECTOR DE PERSONAJE
     [ClientRpc]
     public void ChangeToFighterSelectorCLientRpc(ClientRpcParams clientRpcParams = default)
     {
@@ -124,16 +125,6 @@ public class LobbySelectorUI : NetworkBehaviour
     {
         CreateLobbyServerRpc(NetworkManager.LocalClientId, true);
         Debug.Log("CLIENTE: quiero crear sala PRIVADA");
-    }
-
-    [ClientRpc]
-    public void EnterLobbyClientRpc(ClientRpcParams clientRpcParams = default)
-    {
-        GetComponent<FighterSelectorUI>().RefreshServerRpc(NetworkManager.LocalClientId, -1);
-        lobbySelectorUIObject.SetActive(false);
-        chatUIObject.SetActive(true);
-        GetComponent<ChatUI>().ResetChat();
-        fighterSelectorUIObject.SetActive(true);
     }
 
     public void Refresh()
@@ -178,7 +169,7 @@ public class LobbySelectorUI : NetworkBehaviour
                 TargetClientIds = new ulong[] { clientId }
             }
         };
-        EnterLobbyClientRpc(clientRpcParams);
+        ChangeToFighterSelectorCLientRpc(clientRpcParams);
         Debug.Log("SERVER: num de salas actual: " + lobbyManager.Lobbies.Count);
 
         for (int i = 0; i < lobbyManager.Lobbies.Count; i++)
@@ -187,7 +178,7 @@ public class LobbySelectorUI : NetworkBehaviour
         }
     }
 
-    //METODO QUE ACTUALIZA INTERFAZ
+    //METODO QUE ACTUALIZA INTERFAZ EN CLIENTE
     [ClientRpc]
     public void UpdateUIClientRpc(int i, int lobbyId, int playersInLobby, ClientRpcParams clientRpcParams = default)
     {
