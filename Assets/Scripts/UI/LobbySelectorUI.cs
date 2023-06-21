@@ -120,13 +120,13 @@ public class LobbySelectorUI : NetworkBehaviour
 
     public void OnCreatePublicLobbyPressed()
     {
-        CreateLobbyServerRpc(NetworkManager.LocalClientId, false);
+        CreateLobbyServerRpc(NetworkManager.LocalClientId, false, passwordInputField.text);
         Debug.Log("CLIENTE: quiero crear sala PUBLICA");
     }
 
     public void OnCreatePrivateLobbyPressed()
     {
-        CreateLobbyServerRpc(NetworkManager.LocalClientId, true);
+        CreateLobbyServerRpc(NetworkManager.LocalClientId, true, passwordInputField.text);
         Debug.Log("CLIENTE: quiero crear sala PRIVADA");
     }
 
@@ -157,10 +157,10 @@ public class LobbySelectorUI : NetworkBehaviour
 
     //METODO QUE CREA LOBBY Y ACTUALIZA INTERFAZ DE TODOS
     [ServerRpc(RequireOwnership = false)]
-    public void CreateLobbyServerRpc(ulong clientId, bool isPrivate)
+    public void CreateLobbyServerRpc(ulong clientId, bool isPrivate, string password)
     {
         Debug.Log("SERVER: creando sala");
-        if (!lobbyManager.CreateLobby(clientId, isPrivate, passwordInputField.text))
+        if (!lobbyManager.CreateLobby(clientId, isPrivate, password))
         {
             return;
         }
