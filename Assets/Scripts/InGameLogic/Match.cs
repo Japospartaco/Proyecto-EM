@@ -7,65 +7,43 @@ using Movement.Components;
 
 public class Match
 {
-    Lobby lobby;
-    ClientRpcParams clientRpcParams;
-    List<Vector3> posicionesIniciales = new();
+    // Variables de instancia
+    Lobby lobby; // Representa el lobby de la partida
+    List<Vector3> posicionesIniciales = new(); // Lista de posiciones iniciales de los jugadores
 
-    List<PlayerInformation> players;
-    PlayerInformation player_winner;
-    List<Round> roundList = new List<Round>();
-    Round playing_round;
+    List<PlayerInformation> players; // Lista de información de jugadores
+    PlayerInformation player_winner; // Información del jugador ganador
+    List<Round> roundList = new List<Round>(); // Lista de rondas de la partida
+    Round playing_round; // Ronda actual
 
+    MatchManager matchManager; // Administrador de la partida
 
-    MatchManager matchManager;
+    int idLobby; // ID del lobby
+    int MAX_ROUNDS; // Número máximo de rondas
+    int current_round; // Ronda actual
+    int time_per_round; // Tiempo por ronda
 
-    int idLobby;
-    int MAX_ROUNDS;
-    int current_round;
-    int time_per_round;
+    public EventHandler<Match> StartMatch; // Evento de inicio de partida
+    public EventHandler<Match> EndMatchEvent; // Evento de final de partida
 
-    public EventHandler<Match> StartMatch;
-    public EventHandler<Match> EndMatchEvent;
-
+    // Propiedades de la clase partida
     public Lobby Lobby { get { return lobby; } }
-
-    public List<PlayerInformation> Players
-	{
-        get { return players; }
-        set { players = value; }
-	}
-
-    public PlayerInformation Player_Winner
-    {
-        get { return player_winner; }
-        set { player_winner = value; }
-    }
-
+    public List<PlayerInformation> Players { get { return players; } set { players = value; } }
+    public PlayerInformation Player_Winner { get { return player_winner; } set { player_winner = value; } }
     public Round Playing_Round { get { return playing_round; } }
-
     public MatchManager MatchManager { get { return matchManager; } }
+    public int IdLobby { get { return idLobby; } set { idLobby = value; } }
 
-    public int IdLobby
-	{
-        get { return idLobby; }
-        set { idLobby = value; }
-	}
-
-    public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager, List<Transform> transformIniciales )
-	{
+    // Constructor de la partida
+    public Match(Lobby lobby, int n_rounds, int time_per_round, MatchManager matchManager, List<Transform> transformIniciales)
+    {
+        // Inicialización de variables
         Debug.Log("He empezado la partida.");
         idLobby = lobby.LobbyId;
         players = lobby.PlayersList;
 
-        clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = lobby.GetPlayersIdsList()
-            }
-        };
-
-        for(int i = 0; i < players.Count; i++)
+        // Activa los personajes (Fighters) solo para los jugadores en el lobby
+        for (int i = 0; i < players.Count; i++)
         {
             GameObject fighter = players[i].FighterObject;
             for (int j = 0; j < players.Count; j++)
@@ -74,15 +52,12 @@ public class Match
             }
         }
 
-        foreach (var player in players)
-        {
-        }
-
         this.lobby = lobby;
 
         MAX_ROUNDS = n_rounds;
         this.time_per_round = time_per_round;
 
+        // Suscribe al evento que inicializa la interfaz de usuario
         matchManager.AddEventStartMatch(this);
 
         StartMatch?.Invoke(this, this);
@@ -91,15 +66,16 @@ public class Match
 
         current_round = 0;
 
-        foreach(var currentTransform in transformIniciales)
+        foreach (var currentTransform in transformIniciales)
         {
             posicionesIniciales.Add(currentTransform.position);
         }
         StartRoundFromMatch();
     }
 
+    // Comienza una ronda desde la partida
     void StartRoundFromMatch()
-	{
+    {
         Round round = new Round(this, players, time_per_round, posicionesIniciales);
 
         playing_round = round;
@@ -110,8 +86,9 @@ public class Match
         roundList.Add(playing_round);
     }
 
+    // Gestiona el final de una ronda
     public void EndRound(Round round)
-	{
+    {
         Debug.Log("Se ha terminado la ronda.");
         if (!round.Draw)
             current_round++;
@@ -123,19 +100,20 @@ public class Match
         if ((desconectados == players.Count - 1) || (current_round == MAX_ROUNDS))
         {
             EndMatch();
-        } 
+        }
         else if (desconectados == players.Count)
         {
             lobby.RemoveAllPlayers();
             matchManager.Destroy(this);
         }
-        else 
-		{
+        else
+        {
             StartRoundFromMatch();
             Debug.Log("Empezando siguiente ronda...");
         }
     }
 
+    // Verifica la cantidad de jugadores desconectados en el juego al finalizar una ronda
     public int DesconectadosInGame()
     {
         int desconectados = 0;
@@ -148,24 +126,26 @@ public class Match
         return desconectados;
     }
 
+    // Finaliza la partida y muestra la interfaz posterior a la partida
     public void EndMatch()
     {
         player_winner = GetPlayerWinner();
         matchManager.AddEventEndMatch(this);
 
-        
+
         EndMatchEvent?.Invoke(this, this);
 
         Debug.Log("Fin de la partida.");
     }
 
+    // Obtiene la información del jugador ganador
     PlayerInformation GetPlayerWinner()
-	{
+    {
         PlayerInformation winner = null;
 
         int max_ganadas = 0;
 
-        //////////////////////////////TERMINAR PARTIDA PUNTOS//////////////////////////////////////////
+        // Terminar la partida por puntos
         foreach (var player in players)
         {
             FighterInformation fighterInformation = player.FighterObject.GetComponent<FighterInformation>();
@@ -177,14 +157,15 @@ public class Match
                 if (max_ganadas < ganadas)
                 {
                     max_ganadas = ganadas;
-                    winner = player;    //EN CASO DE QUE NO VAYA, COMENTAR ESTA LINEA Y DESCOMENTAR EL CHORIZO DE ABAJO
+                    winner = player; // En caso de que no funcione, comentar esta línea y descomentar la siguiente
                 }
-            } else
+            }
+            else
             {
                 Debug.Log("Jugador desconectado");
             }
         }
 
         return winner;
-	}
+    }
 }

@@ -7,23 +7,29 @@ using TMPro;
 
 public class LobbySelectorUI : NetworkBehaviour
 {
+    [Header("UIs utilizadas")]
     [SerializeField] private GameObject lobbySelectorUIObject;
     [SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject chatUIObject;
 
+    [Header("Objetos con layers utilizadas")]
     [SerializeField] private List<GameObject> lobbiesUIObjects;
 
+    [Header("Gestion de entrada a lobbies")]
     [SerializeField] private List<Button> joinButtons;
     [SerializeField] private List<TMP_Text> joinButtonTexts;
     [SerializeField] private List<TMP_Text> numPlayerstexts;
 
+    [Header("Gestión de creación de lobby")]
     [SerializeField] private Button createPublicLobbyButton;
     [SerializeField] private Button createPrivateLobbyButton;
-    [SerializeField] private Button refreshButton;
-
     [SerializeField] private TMP_InputField passwordInputField;
 
-    private LobbyManager lobbyManager;
+    [Header("Refresh button")]
+    [SerializeField] private Button refreshButton;
+
+    [Header("Clases auxiliares")]
+    [SerializeField] LobbyManager lobbyManager;
 
     private void Start()
     {
@@ -37,9 +43,6 @@ public class LobbySelectorUI : NetworkBehaviour
         createPublicLobbyButton.onClick.AddListener(OnCreatePublicLobbyPressed);
         createPrivateLobbyButton.onClick.AddListener(OnCreatePrivateLobbyPressed);
         refreshButton.onClick.AddListener(OnRefreshButtonPressed);
-
-        lobbyManager = GameObject.FindWithTag("Game Manager").GetComponent<LobbyManager>();
-        if (lobbyManager == null) Debug.Log("LOBBY MANAGER NO ENCONTRAO");
     }
 
 

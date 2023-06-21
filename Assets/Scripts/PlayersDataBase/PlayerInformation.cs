@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class PlayerInformation : MonoBehaviour
 {
+    [Header("Informacion del cliente")]
     [SerializeField] private ulong id;
     [SerializeField] private string username;
-    [SerializeField] private GameObject fighterObject;
+
+    [Header("Informacion de la lobby")]
     [SerializeField] private int currentLobbyId;
     [SerializeField] private int idInLobby;
+
+    [Header("Informacion del fighter")]
+    [SerializeField] private GameObject fighterObject;
     [SerializeField] private int selectedFighter;
 
     public ulong Id

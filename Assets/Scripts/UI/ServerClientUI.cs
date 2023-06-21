@@ -6,8 +6,11 @@ namespace UI
 {
     public class ServerClientUI : MonoBehaviour
     {
+        [Header("UIs utilizadas")]
         [SerializeField] private GameObject ServerClientUIObject;
         [SerializeField] private GameObject LogInUIObject;
+
+        [Header("Botones")]
         [SerializeField] private Button clientButton;
         [SerializeField] private Button serverButton;
 

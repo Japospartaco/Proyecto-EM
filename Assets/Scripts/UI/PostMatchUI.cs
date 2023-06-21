@@ -9,31 +9,31 @@ using UnityEngine.UI;
 
 public class PostMatchUI : NetworkBehaviour
 {
-
-    [Space]
+    // Variables de referencia a los elementos de la interfaz de usuario
+    [Header("UIs utilizadas")]
     [SerializeField] GameObject matchUI;
     [SerializeField] GameObject postMatchUI;
     [SerializeField] GameObject lobbySelectorUI;
     [SerializeField] GameObject fighterSelectorUI;
     [SerializeField] GameObject chatUI;
 
-    [Space]
+    [Header("Contenedor de los jugadores")]
     [SerializeField] List<GameObject> playersUI;
 
-    [Space]
+    [Header("Imagenes")]
     [SerializeField] List<Sprite> fighters_sprite;
     [SerializeField] List<Image> playersImage;
     [SerializeField] Image winnerImage;
 
-    [Space]
+    [Header("Cajas de texto")]
     [SerializeField] List<TMP_Text> playersInformation;
     [SerializeField] TMP_Text winnerInformation;
 
-    [Space]
+    [Header("Botones")]
     [SerializeField] Button buttonReturnLobbySelector;
     [SerializeField] Button buttonReturnFighterSelector;
 
-    [Space]
+    [Header("Clases auxiliares")]
     [SerializeField] OnlinePlayers onlinePlayers;
     [SerializeField] LobbyManager lobbyManager;
     [SerializeField] MatchManager matchManager;
@@ -54,7 +54,7 @@ public class PostMatchUI : NetworkBehaviour
         lobbySelector = GetComponent<LobbySelectorUI>();
     }
 
-
+    // Método que se llama para mostrar la interfaz de usuario posterior a una partida
     public void ComputeInterfaces(Match match)
     {
         int lobbyId = match.Lobby.LobbyId;
@@ -74,6 +74,7 @@ public class PostMatchUI : NetworkBehaviour
         RemoveAllPlayersFromLobby(match);
     }
 
+    // Método RPC del cliente que establece el ID del lobby
     [ClientRpc]
     void SelectLobbyIDClientRpc(int lobbyId, ClientRpcParams clientRpcParams = default)
     {
@@ -81,6 +82,7 @@ public class PostMatchUI : NetworkBehaviour
         Debug.Log($"{NetworkManager.LocalClientId}: lobby id seteado.");
     }
 
+    // Muestra los resultados de la partida en la interfaz de usuario
     void ShowResult(Match match)
     {
         Debug.Log("Soy servidor");
@@ -110,7 +112,7 @@ public class PostMatchUI : NetworkBehaviour
         MostrarInterfazGanadorClientRpc(winner.SelectedFighter, winner_text, clientRpcParams);
     }
 
-
+    // Método RPC del cliente para mostrar la interfaz de usuario de los jugadores
     [ClientRpc]
     void MostrarInterfazJugadoresClientRpc(int index, int selectedFighter, string text, int winnerSelectedFighter, string textWinner, ClientRpcParams clientRpcParams = default)
     {
@@ -118,9 +120,10 @@ public class PostMatchUI : NetworkBehaviour
 
         playersUI[index].SetActive(true);
         playersImage[index].sprite = fighters_sprite[selectedFighter];
-        playersInformation[index].text = text; 
+        playersInformation[index].text = text;
     }
 
+    // Método RPC del cliente para mostrar la interfaz de usuario del ganador
     [ClientRpc]
     void MostrarInterfazGanadorClientRpc(int winnerSelectedFighter, string textWinner, ClientRpcParams clientRpcParams = default)
     {
@@ -128,12 +131,14 @@ public class PostMatchUI : NetworkBehaviour
         winnerInformation.text = textWinner;
     }
 
+    // Elimina a todos los jugadores del lobby
     public void RemoveAllPlayersFromLobby(Match match)
     {
         Lobby lobby = match.Lobby;
         lobby.RemoveAllPlayers();
     }
 
+    // Maneja el evento de presionar el botón de volver al lobby selector
     public void OnButtonReturnLobbySelectorPressed()
     {
         Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
@@ -143,6 +148,7 @@ public class PostMatchUI : NetworkBehaviour
         lobbySelector.RefreshServerRpc(id);
     }
 
+    // Método RPC del servidor para manejar el evento de presionar el botón de volver al lobby selector
     [ServerRpc(RequireOwnership = false)]
     void ComputeOnButtonReturnLobbySelectorPressedServerRpc(ulong clientId)
     {
@@ -160,6 +166,7 @@ public class PostMatchUI : NetworkBehaviour
         OcultarUIClientRpc(playersImage.Count, clientRpcParams);
     }
 
+    // Método RPC del cliente para volver al lobby selector
     [ClientRpc]
     public void ReturnToLobbySelectorClientRpc(ClientRpcParams clientRpcParams = default)
     {
@@ -168,12 +175,9 @@ public class PostMatchUI : NetworkBehaviour
         postMatchUI.SetActive(false);
 
         lobbySelectorUI.SetActive(true);
-
-       // GetComponent<FighterSelectorUI>().OcultarHiddenObjects();
     }
 
-
-
+    // Maneja el evento de presionar el botón de volver al selector de luchadores
     void OnButtonReturnFighterSelectorPressed()
     {
         Debug.Log("CLIENTE: HE PRESIONADO EL BOTON DE VOLVER AL LOBBY SELECTOR");
@@ -181,6 +185,7 @@ public class PostMatchUI : NetworkBehaviour
         ComputeOnButtonReturnFighterSelectorPressedServerRpc(NetworkManager.LocalClientId, clientLobbyId);
     }
 
+    // Método RPC del servidor para manejar el evento de presionar el botón de volver al selector de luchadores
     [ServerRpc(RequireOwnership = false)]
     private void ComputeOnButtonReturnFighterSelectorPressedServerRpc(ulong clientId, int clientLobbyId)
     {
@@ -206,6 +211,7 @@ public class PostMatchUI : NetworkBehaviour
         OcultarUIClientRpc(playersImage.Count, clientRpcParams);
     }
 
+    // Método RPC del cliente para volver al selector de luchadores
     [ClientRpc]
     private void ReturnToFighterSelectorClientRpc(ClientRpcParams clientRpcParams = default)
     {
@@ -219,6 +225,7 @@ public class PostMatchUI : NetworkBehaviour
         GetComponent<ChatUI>().ResetChat();
     }
 
+    // Método RPC del cliente para ocultar la interfaz de usuario de los jugadores
     [ClientRpc]
     void OcultarUIClientRpc(int countPlayers, ClientRpcParams clientRpcParams = default)
     {

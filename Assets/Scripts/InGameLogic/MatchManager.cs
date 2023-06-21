@@ -6,8 +6,10 @@ using UnityEngine;
 
 public class MatchManager : NetworkBehaviour
 {
-    [SerializeField] List<Match> matchList = new();
-    [SerializeField] MatchUI matchUI;
+    [Header("Clases auxiliares")]
+    [SerializeField] MatchUI matchUI; // Referencia al componente MatchUI utilizado para mostrar la interfaz del partido
+
+    List<Match> matchList = new(); // Lista de partidas en el administrador de partidas
 
     public List<Match> MatchList
     {
@@ -22,25 +24,25 @@ public class MatchManager : NetworkBehaviour
     public void AddEventStartMatch(Match match)
     {
         if (!IsServer) return;
-        matchUI.SuscribirInicializarUIHealth(match);
+        matchUI.SuscribirInicializarUIHealth(match); // Suscribirse al evento de inicio del partido para inicializar la interfaz de salud
     }
 
     public void AddEventHealthInterface(HealthManager fighterDamaged)
     {
         if (!IsServer) return;
-        matchUI.SuscribirInterfazVidas(fighterDamaged);
+        matchUI.SuscribirInterfazVidas(fighterDamaged); // Suscribirse al evento de interfaz de salud para actualizar la interfaz cuando un luchador recibe daño
     }
 
     public void AddEventTimerMatch(CountdownTimer countdownTimer)
-	{
+    {
         if (!IsServer) return;
-        matchUI.SuscribirTiempo(countdownTimer);
+        matchUI.SuscribirTiempo(countdownTimer); // Suscribirse al evento del temporizador del partido para mostrar el tiempo restante en la interfaz
     }
 
     public void AddEventEndMatch(Match match)
     {
         if (!IsServer) return;
-        matchUI.SuscribirFinPartida(match);
+        matchUI.SuscribirFinPartida(match); // Suscribirse al evento de fin del partido para mostrar los resultados finales en la interfaz
     }
 
     public Match ReturnMatch(Match match)
@@ -69,9 +71,9 @@ public class MatchManager : NetworkBehaviour
     {
         Debug.Log("Destruyendo la partida.");
 
-        foreach(var player in match.Players)
+        foreach (var player in match.Players)
         {
-            Destroy(player.FighterObject);
+            Destroy(player.FighterObject); // Destruir los objetos de luchadores asociados a la partida
         }
     }
 

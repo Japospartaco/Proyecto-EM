@@ -8,35 +8,32 @@ using Movement.Components;
 
 public class FighterSelectorUI : NetworkBehaviour
 {
+    [Header("Texto de los jugadores")]
     [SerializeField] private List<TMP_Text> playersText;
 
-    [Space][SerializeField] private GameObject fighterSelectorUIObject;
+    [Header("UIs utilizadas")]
+    [SerializeField] private GameObject fighterSelectorUIObject;
     [SerializeField] private GameObject chatUIObject;
     [SerializeField] private GameObject lobbySelectorUIObject;
     [SerializeField] private GameObject matchUIObject;
 
-    [Space][SerializeField] private Button readyButton;
+    [Header("Botones")]
+    [SerializeField] private Button readyButton;
     [SerializeField] private Button returnButton;
 
-    [Space][SerializeField] private TMP_Dropdown fighterSelectorInput;
+    [Header("Seleccion de personaje")][SerializeField] private TMP_Dropdown fighterSelectorInput;
     [SerializeField] private List<GameObject> fightersPrefab;
 
-    [Space][SerializeField] private MatchManager matchManager;
+    [Header("Gestion de rondas y tiempo")]
     [SerializeField] private TMP_Dropdown roundNumberSelectorInput;
     [SerializeField] private int[] roundNumberOptions;
-
     [SerializeField] private TMP_Dropdown timeSelectorInput;
     [SerializeField] private int[] timeOptions;
 
-    [Space]
-    [SerializeField] List<LayerMask> layerLobbies;
-
-    
-
-    private OnlinePlayers onlinePlayers;
-    private LobbyManager lobbyManager;
-
-    private List<NetworkVariable<string>> playerStrings;
+    [Header("Clases auxiliares")]
+    [SerializeField] private MatchManager matchManager;
+    [SerializeField] private OnlinePlayers onlinePlayers;
+    [SerializeField] private LobbyManager lobbyManager;
 
     private void Start()
     {
@@ -44,13 +41,6 @@ public class FighterSelectorUI : NetworkBehaviour
         
         readyButton.onClick.AddListener(OnReadyButtonPressed);
         returnButton.onClick.AddListener(OnReturnButtonPressed);
-
-        //timeSelectorInput.onValueChanged.AddListener(OnTimeChanged);
-        //roundNumberSelectorInput.onValueChanged.AddListener(OnRoundsChanged);
-
-        onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
-        lobbyManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<LobbyManager>();
-
     }
 
 
@@ -227,7 +217,7 @@ public class FighterSelectorUI : NetworkBehaviour
         for (int i = 0; i < lobby.PlayersList.Count; i++)
         {
             PlayerInformation player = lobby.PlayersList[i];
-            InstantiateCharacter(lobby, player.Id, player.SelectedFighter, transformIniciales[i], clientRpcParams);
+            InstantiateCharacter(lobby, player.Id, player.SelectedFighter, transformIniciales[i]);
 
         }
 
@@ -236,7 +226,7 @@ public class FighterSelectorUI : NetworkBehaviour
 
 
     // METODO EN SERVER QUE INSTANCIA FIGHTER
-    public void InstantiateCharacter(ulong id, int selectedFighter, Transform posInit)
+    public void InstantiateCharacter(Lobby lobby, ulong id, int selectedFighter, Transform posInit)
     {
         if (!IsServer) return;
         GameObject characterGameObject = Instantiate(fightersPrefab[selectedFighter], posInit);

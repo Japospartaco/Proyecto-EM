@@ -8,23 +8,24 @@ using UnityEngine.UI;
 
 public class MatchUI : NetworkBehaviour
 {
-    [Space]
+    [Header("UIs utilizadas")]
     [SerializeField] GameObject matchUI;
     [SerializeField] GameObject postMatchUI;
     PostMatchUI postMatchUIScript;
 
-    [Space]
+    [Header("Tiempo")]
     [SerializeField] private TMP_Text textBoxTimer;
-    [SerializeField] List<GameObject> playerContainerList;
 
+    [Header("Interfaz de vida")]
+    [SerializeField] List<GameObject> playerContainerList;
     [SerializeField] List<Image> playerImageList;
     [SerializeField] List<TMP_Text> playerUsernameList;
     [SerializeField] List<TMP_Text> playerHealthList;
 
-    [Space]
+    [Header("Imagenes")]
     [SerializeField] List<Sprite> fighterIcons;
 
-    [Space]
+    [Header("Clases auxiliares")]
     [SerializeField] LobbyManager lobbyManager;
 
     public EventHandler UpdateUITime;
@@ -46,34 +47,35 @@ public class MatchUI : NetworkBehaviour
 
     public void SuscribirInicializarUIHealth(Match match)
     {
-        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de inicializar ui de health.");
+        // Suscribe el evento StartMatch al método InitializeUIHealth
         match.StartMatch += InitializeUIHealth;
     }
 
     public void SuscribirInterfazVidas(HealthManager healthManager)
     {
-        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de vidas.");
+        // Suscribe los eventos DmgTakenEvent y ResetHealthEvent del HealthManager a UpdateUIHealth
         healthManager.DmgTakenEvent += UpdateUIHealth;
         healthManager.ResetHealthEvent += UpdateUIHealth;
     }
 
     public void SuscribirTiempo(CountdownTimer countdownTimer)
     {
-        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de tiempo.");
+        // Suscribe el evento UpdateUITimeEvent del CountdownTimer a UpdateUITimer
         countdownTimer.UpdateUITimeEvent += UpdateUITimer;
     }
 
     public void SuscribirFinPartida(Match match)
     {
-        //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de fin de partida.");
+        // Suscribe el evento EndMatchEvent de la partida a UpdateEndUI
         match.EndMatchEvent += UpdateEndUI;
     }
 
     public void InitializeUIHealth(object sender, Match match)
     {
-        // Debug.Log("He llegado a inicializar UI Health"); // Llego aqui
+        // Obtiene la lista de jugadores en el lobby de la partida
         List<PlayerInformation> listPlayers = match.Lobby.PlayersList;
 
+        // Configura los parámetros de envío del RPC a todos los clientes del lobby
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
@@ -82,6 +84,7 @@ public class MatchUI : NetworkBehaviour
             }
         };
 
+        // Itera sobre la lista de jugadores
         for (int i = 0; i < listPlayers.Count; i++)
         {
             PlayerInformation player = listPlayers[i];
@@ -93,37 +96,46 @@ public class MatchUI : NetworkBehaviour
 
             Debug.Log($"SERVIDOR: Inicializando la UI de {user}, con {health} vida y {selectedFighter} personajes seleccionado.");
 
+            // Invoca el RPC para inicializar la UI de salud en los clientes
             InitializeUIHealthClientRpc(i, user, health, selectedFighter, clientRpcParams);
         }
-
     }
 
     [ClientRpc]
     void InitializeUIHealthClientRpc(int index, string user, string health, int selectedFighter, ClientRpcParams clientRpcParams = default)
     {
+        // Restaura el color original y la imagen en blanco del contenedor del jugador
         playerContainerList[index].GetComponent<Image>().color = originalColorList[index];
         playerImageList[index].color = Color.white;
 
+        // Activa el contenedor del jugador
         playerContainerList[index].SetActive(true);
+
+        // Configura la imagen del jugador con el sprite correspondiente al personaje seleccionado
         playerImageList[index].sprite = fighterIcons[selectedFighter];
+
+        // Establece el nombre de usuario y la salud del jugador en la UI
         playerUsernameList[index].text = user;
         playerHealthList[index].text = health;
     }
 
     public void UpdateUIHealth(object sender, GameObject fighterDamaged)
     {
-        //AQUI SE UPDATEAN LOS VALORES DE LA VIDA.
+        // Verifica si el luchador está desconectado y no actualiza la UI de salud si es así
         if (fighterDamaged.GetComponent<FighterInformation>().IsDisconnected)
         {
             return;
         }
 
+        // Obtiene el HealthManager y la información del jugador del luchador dañado
         HealthManager healthManager = fighterDamaged.GetComponent<HealthManager>();
         PlayerInformation player = fighterDamaged.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>();
 
+        // Obtiene el ID del lobby del jugador y el lobby correspondiente
         int lobbyId = lobbyManager.GetPlayersLobby(player.Id);
         Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
 
+        // Configura los parámetros de envío del RPC a todos los clientes del lobby
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
@@ -136,30 +148,35 @@ public class MatchUI : NetworkBehaviour
         int max_health = healthManager.maxHealth;
 
         string text = $"{current_health}/{max_health}";
-        // Debug.Log($"{player.Username}: {text}");
 
         int idInLobby = player.IdInLobby;
 
-        if (current_health > 0) UpdateUIHealthClientRpc(text, idInLobby, clientRpcParams);
-        else UpdateDeadHealthClientRpc(text, idInLobby, clientRpcParams);
+        // Invoca el RPC para actualizar la UI de salud del jugador en los clientes
+        if (current_health > 0)
+            UpdateUIHealthClientRpc(text, idInLobby, clientRpcParams);
+        else
+            UpdateDeadHealthClientRpc(text, idInLobby, clientRpcParams);
     }
 
     [ClientRpc]
     public void UpdateUIHealthClientRpc(string text, int idInLobby, ClientRpcParams clientRpcParams = default)
     {
+        // Restaura el color original del contenedor del jugador
         playerContainerList[idInLobby].GetComponent<Image>().color = originalColorList[idInLobby];
         playerImageList[idInLobby].color = Color.white;
 
+        // Actualiza el texto de la salud del jugador en la UI
         playerHealthList[idInLobby].text = text;
     }
 
     [ClientRpc]
     public void UpdateDeadHealthClientRpc(string text, int idInLobby, ClientRpcParams clientRpcParams = default)
     {
+        // Cambia el color del contenedor del jugador a un color representativo de la muerte
         playerContainerList[idInLobby].GetComponent<Image>().color = colorDeath;
         playerImageList[idInLobby].color = Color.black;
 
-
+        // Actualiza el texto de la salud del jugador en la UI
         playerHealthList[idInLobby].text = text;
     }
 
@@ -176,42 +193,31 @@ public class MatchUI : NetworkBehaviour
         };
 
         CountdownTimer countdownTimer = match.Playing_Round.Timer;
-        float timer = countdownTimer.Timer;
 
-        int minutes = (int)timer / 60;
-        int seconds = (int)timer % 60;
-
-        text = setText(minutes, seconds);
-
-        ActualizarTiempoClientRpc(text, clientRpcParams);
-    }
-
-    string setText(int minutes, int seconds)
-    {
-        string text;
-        string minutes_string;
-        string seconds_string;
-
-        if (minutes < 10)
-            minutes_string = $"0{minutes}";
+        // Verifica si el temporizador ha finalizado
+        if (countdownTimer.CurrentTime <= 0)
+        {
+            text = "00:00";
+        }
         else
-            minutes_string = $"{minutes}";
+        {
+            // Calcula los minutos y segundos restantes en el temporizador
+            int minutes = Mathf.FloorToInt(countdownTimer.CurrentTime / 60);
+            int seconds = Mathf.FloorToInt(countdownTimer.CurrentTime % 60);
 
-        if (seconds < 10)
-            seconds_string = $"0{seconds}";
-        else
-            seconds_string = $"{seconds}";
+            // Formatea el texto del temporizador con ceros a la izquierda
+            text = $"{minutes:00}:{seconds:00}";
+        }
 
-        text = $"{minutes_string}:{seconds_string}";
-
-        return text;
+        // Invoca el RPC para actualizar el temporizador en los clientes
+        UpdateUITimerClientRpc(text, clientRpcParams);
     }
-
 
     [ClientRpc]
-    private void ActualizarTiempoClientRpc(string text, ClientRpcParams clientRpcParams = default)
+    public void UpdateUITimerClientRpc(string text, ClientRpcParams clientRpcParams = default)
     {
-        textBoxTimer.text = $"{text}";
+        // Actualiza el texto del temporizador en la UI
+        textBoxTimer.text = text;
     }
 
     public void UpdateEndUI(object sender, Match match)

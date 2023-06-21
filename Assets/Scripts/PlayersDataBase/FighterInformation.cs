@@ -6,9 +6,13 @@ using UnityEngine;
 //########### EN PRINCIPIO NO SE USA #############
 public class FighterInformation : MonoBehaviour
 {
+    [Header("Informacion del jugador")]
     [SerializeField] private GameObject player;
-    [SerializeField] int winnedRounds = 0;
     [SerializeField] bool isDisconnected = false; // CUANDO CLIENTE SE DESCONECTE NO QUEREMOS QUE REVIVA
+
+    [Header("Informacion del fighter")]
+    [SerializeField] int winnedRounds = 0;
+
 
     public GameObject Player
     {

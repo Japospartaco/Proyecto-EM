@@ -13,19 +13,22 @@ namespace Movement.Components
      RequireComponent(typeof(NetworkObject))]
     public sealed class FighterMovement : NetworkBehaviour, IMoveableReceiver, IJumperReceiver, IFighterReceiver, IDashReceiver
     {
-        public float speed = 1.0f;
-        public float jumpAmount = 1.0f;
+        // Variables públicas
+        public float speed = 1.0f; // Velocidad del movimiento del luchador
+        public float jumpAmount = 1.0f; // Cantidad de fuerza aplicada al saltar
 
-        private Rigidbody2D _rigidbody2D;
-        private Animator _animator;
-        private NetworkAnimator _networkAnimator;
-        private Transform _feet;
-        private LayerMask _floor;
+        // Variables privadas
+        private Rigidbody2D _rigidbody2D; // Referencia al componente Rigidbody2D
+        private Animator _animator; // Referencia al componente Animator
+        private NetworkAnimator _networkAnimator; // Referencia al componente NetworkAnimator
+        private Transform _feet; // Referencia al transform del objeto "Feet"
+        private LayerMask _floor; // Máscara de capas para detectar el suelo
 
-        private Vector3 _direction = Vector3.zero;
-        private bool _grounded = true;
-        private bool dashed = false;
+        private Vector3 _direction = Vector3.zero; // Dirección del movimiento
+        private bool _grounded = true; // Indica si el luchador está en el suelo
+        private bool dashed = false; // Indica si el luchador ha realizado un dash
 
+        // Hashes de los parámetros del Animator
         private static readonly int AnimatorSpeed = Animator.StringToHash("speed");
         private static readonly int AnimatorVSpeed = Animator.StringToHash("vspeed");
         private static readonly int AnimatorGrounded = Animator.StringToHash("grounded");
@@ -34,11 +37,12 @@ namespace Movement.Components
         private static readonly int AnimatorHit = Animator.StringToHash("hit");
         private static readonly int AnimatorDie = Animator.StringToHash("die");
 
-        bool allowedMovement = true;
+        bool allowedMovement = true; // Indica si el movimiento está permitido
 
-        public EventHandler<GameObject> DieEvent;
+        public EventHandler<GameObject> DieEvent; // Evento que se dispara cuando el luchador muere
 
-        public SemaphoreSlim EsperandoResucitar = new SemaphoreSlim(0);
+        public SemaphoreSlim EsperandoMorir = new SemaphoreSlim(0); // Semáforo para esperar la muerte del luchador
+
 
         public bool AllowedMovement
 		{
@@ -59,7 +63,6 @@ namespace Movement.Components
         void Update()
         {
             if (!IsOwner) return;
-
             
             UpdateServerRpc();
         }
@@ -134,7 +137,6 @@ namespace Movement.Components
                         Vector2 forceDirection = new Vector2(transform.localScale.x, 0f).normalized;
                         Vector2 dashForceVector = forceDirection * dashForce;
                         _rigidbody2D.AddForce(dashForceVector, ForceMode2D.Impulse);
-                        //dashed = true;
                     }
                     break;
                 case IDashReceiver.Stage.Posible:
@@ -163,35 +165,9 @@ namespace Movement.Components
                     break;
             }
         }
-        /// <summary>
 
-
-        /// </summary>
-        /*
-       public void Dash(IDashReceiver.Direction direction)
-       {
-           ComputeDashServerRpc(direction);
-       }
-
-       [ServerRpc]
-       public void ComputeDashServerRpc(IDashReceiver.Direction direction)
-       {
-           if (_grounded)
-           {
-               if (direction == IDashReceiver.Direction.None)
-               {
-                   //this._direction = Vector3.zero;
-                   return;
-               }
-
-               bool lookingRight = direction == IDashReceiver.Direction.Right;
-               _direction = (lookingRight ? 1f : -1f) * (speed * 3.0f) * Vector3.right;
-               transform.localScale = new Vector3(lookingRight ? 1 : -1, 1, 1);
-           }
-       }*/
         public void Attack1()
         {
-            //_networkAnimator.SetTrigger(AnimatorAttack1);
             ComputeAttack1ServerRpc();
         }
 
@@ -203,7 +179,6 @@ namespace Movement.Components
 
         public void Attack2()
         {
-            //_networkAnimator.SetTrigger(AnimatorAttack2);
             ComputeAttack2ServerRpc();
         }
 
@@ -245,7 +220,7 @@ namespace Movement.Components
         {
 
             gameObject.SetActive(false);
-            EsperandoResucitar.Release();
+            EsperandoMorir.Release();
 
         }
 
@@ -260,8 +235,7 @@ namespace Movement.Components
         [ClientRpc]
         void ReviveClientRpc(ClientRpcParams clientRpcParams = default)
         {
-            EsperandoResucitar.Wait();
-
+            EsperandoMorir.Wait();
             gameObject.SetActive(true);
         }
 

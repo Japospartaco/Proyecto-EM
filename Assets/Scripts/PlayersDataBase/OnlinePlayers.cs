@@ -8,8 +8,8 @@ using Movement.Components;
 
 public class OnlinePlayers : NetworkBehaviour
 {
-
-    private Dictionary<ulong, GameObject> onlinePlayers = new();
+    [Header("Diccionario <idClient, player>")]
+    [SerializeField] Dictionary<ulong, GameObject> onlinePlayers = new();
 
     public Dictionary<ulong, GameObject> OnlinePlayersDictionary
     {

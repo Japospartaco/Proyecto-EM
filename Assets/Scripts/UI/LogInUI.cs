@@ -6,12 +6,16 @@ using System.Collections.Generic;
 
 public class LogInUI : NetworkBehaviour
 {
+    [Header("UIs utilizadas")]
     [SerializeField] private GameObject LogInUIObject;
     [SerializeField] private GameObject LobbySelectorUIObject;
     [SerializeField] private GameObject FighterSelectorUIObject;
+
+    [Header("Log in")]
     [SerializeField] private TMP_InputField usernameInput;
     [SerializeField] private Button logInButton;
 
+    [Header("Objetos ocultos")]
     [SerializeField] private List<GameObject> gameObjectsToShow;
 
     

@@ -7,13 +7,13 @@ using UnityEngine.UI;
 
 public class ChatUI : NetworkBehaviour
 {
-    [Space]
+    [Header("UIs utilizadas")]
     [SerializeField] GameObject ChatUIObject;
 
-    [Space]
+    [Header("Cuadros de texto de los mensajes")]
     [SerializeField] List<TMP_Text> textBoxMensajesList;
-    
-    [Space]
+
+    [Header("Clases auxiliares")]
     [SerializeField] LobbyManager lobbyManager;
     [SerializeField] OnlinePlayers onlinePlayers;
 

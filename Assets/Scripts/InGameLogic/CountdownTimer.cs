@@ -1,67 +1,55 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 
 public class CountdownTimer
 {
-    private float timer;
-    private float alarmTime;
-    private bool started;
-    public EventHandler Alarm;
-    public EventHandler<Match> UpdateUITimeEvent;
+    private float currentTime; // Tiempo actual del temporizador
+    private float alarmTime; // Tiempo de alarma
+    private bool started; // Indica si el temporizador ha comenzado
+    public EventHandler Alarm; // Evento que se dispara cuando se alcanza el tiempo de alarma
+    public EventHandler<Match> UpdateUITimeEvent; // Evento para actualizar el tiempo en la interfaz de usuario
 
-    Round round;
+    Round round; // Referencia a la instancia de la clase Round
 
-    public float Timer
-    {
-        get { return timer; }
-        set { timer = value; }
-    }
-
-    public Round Round
-	{
-        get { return round; }
-	}
+    public float CurrentTime { get { return currentTime; } set { currentTime = value; } }
 
     public CountdownTimer(float seconds, Round round)
     {
         this.alarmTime = seconds;
-        this.timer = seconds;
+        this.currentTime = seconds;
         this.round = round;
 
-        GameObject.FindGameObjectWithTag("Clock").GetComponent<Clock>().ClockTick += UpdateTimer; 
+        GameObject.FindGameObjectWithTag("Clock").GetComponent<Clock>().ClockTick += UpdateTimer;
+        // Busca un objeto con la etiqueta "Clock" en la escena y se suscribe al evento ClockTick del componente Clock para actualizar el temporizador
     }
 
     public void StartTimer()
     {
-        started = true;
+        started = true; // Marca el temporizador como iniciado
     }
 
     public void ResetTimer()
     {
-        started = false;
-        timer = alarmTime;
+        started = false; // Marca el temporizador como no iniciado
+        currentTime = alarmTime; // Restablece el tiempo actual al tiempo de alarma original
     }
 
     public void UpdateTimer(object sender, float deltaTime)
     {
-        if (!started) return;
+        if (!started) return; // Si el temporizador no ha comenzado, no realiza ninguna acción
 
-        timer -= deltaTime;
+        currentTime -= deltaTime; // Actualiza el tiempo actual restando el tiempo transcurrido
 
-        UpdateUITimeEvent?.Invoke(this, round.Match);
-        CheckAlarm();
+        UpdateUITimeEvent?.Invoke(this, round.Match); // Invoca el evento UpdateUITimeEvent para notificar a otros componentes sobre el cambio de tiempo en la interfaz de usuario
+        CheckAlarm(); // Verifica si se ha alcanzado la alarma
     }
 
     private void CheckAlarm()
     {
-        if (timer < 0)
+        if (currentTime < 0)
         {
-            started = false;
-            Alarm?.Invoke(this, null);
+            started = false; // Detiene el temporizador
+            Alarm?.Invoke(this, null); // Dispara el evento Alarm para indicar que se ha alcanzado el tiempo de alarma
         }
     }
 }
