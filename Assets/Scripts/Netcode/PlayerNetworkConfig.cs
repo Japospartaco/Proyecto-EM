@@ -13,8 +13,6 @@ namespace Netcode
         {
             if (!IsOwner) return;
 
-            //#########BORRAR CUANDO SEA
-            //InstantiateCharacterServerRpc(OwnerClientId);
 
             //OBTENEMOS EL "ID" DEL CLIENT Y EL "USERNAME" QUE HAYA ESCRITO POR PANTALLA
             string username = GameObject.FindGameObjectWithTag("UI Manager").GetComponent<LogInUI>().GetUsernameInput();
@@ -23,6 +21,7 @@ namespace Netcode
             NewClientServerRpc(username, id);
         }
 
+        //metodo que gestiona a los nuevos clientes, registrandolos en la base de datos "onlinePlayers"
         [ServerRpc]
         private void NewClientServerRpc(string username, ulong clientId)
         {
@@ -32,6 +31,8 @@ namespace Netcode
 
             //INICIALIZACION DE LOS VALORES DE SU  COMPONENTE "PLAYER INFROMATION"
             gameObject.GetComponent<PlayerInformation>().InitializePlayer(clientId, username, fighterObject, currentLobbyId, idInLobby);
+
+
             onlinePlayers = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<OnlinePlayers>();
             List<NetworkObject> list = onlinePlayers.ReturnNetworkObjectList();
 

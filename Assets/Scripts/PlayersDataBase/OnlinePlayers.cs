@@ -6,10 +6,11 @@ using Movement.Commands;
 using UnityEngine.TextCore.Text;
 using Movement.Components;
 
+// clase encargada de gestionar los clientes que se vayan uniendo
 public class OnlinePlayers : NetworkBehaviour
 {
     [Header("Diccionario <idClient, player>")]
-    [SerializeField] Dictionary<ulong, GameObject> onlinePlayers = new();
+    [SerializeField] Dictionary<ulong, GameObject> onlinePlayers = new(); //diccionario que clasifica los clientes por su id
 
     public Dictionary<ulong, GameObject> OnlinePlayersDictionary
     {
@@ -21,6 +22,7 @@ public class OnlinePlayers : NetworkBehaviour
         NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
+    //metodo que devuelve una lista con todos los network objects de los clientes en el diccionario
     public List<NetworkObject> ReturnNetworkObjectList()
     {
         List<NetworkObject> networkObjectList = new List<NetworkObject>();
@@ -38,12 +40,13 @@ public class OnlinePlayers : NetworkBehaviour
         return networkObjectList;
     }
 
+    //metodo para añadir clientes al diciconario
     public void AddPlayer(ulong id, GameObject player)
     {
         if (!IsServer) return;
-        Debug.Log("SERVER: player añadido: " + id);
+
         onlinePlayers[id] = player;
-        Debug.Log("SERVER: comprobacion de player: " + onlinePlayers[id].GetComponent<PlayerInformation>().Username);
+
     }
 
     //METODO PARA OBTENER UNA LISTA DE GAMEOBJECTS "PLAYER" A PARTIR DE UNA LISTA DE IDS
@@ -88,28 +91,39 @@ public class OnlinePlayers : NetworkBehaviour
         return onlinePlayers[id].GetComponent<PlayerInformation>();
     }
 
-
+    //metodo encargado de la gestion de las desconexiones
     public void OnClientDisconnected(ulong clientId)
     {
         if (!IsServer) return;
 
+        //primero se comprueba si el cliente estaba dentro de una sala, de no ser asi, solo se elimina del diccionario
         int currentLobbyId = onlinePlayers[clientId].GetComponent<PlayerInformation>().CurrentLobbyId;
-        if (currentLobbyId == -1) return;
+        if (currentLobbyId == -1)
+        {
+            onlinePlayers.Remove(clientId);
+            return;
+        }
 
+        //obtenemos la sala donde se encuentre
         Lobby lobby = GetComponent<LobbyManager>().GetLobbyFromId(currentLobbyId);
 
         GameObject fighter = null;
+
+        //comprobamos si la partida en la lobby esta empezada
         if (lobby.IsStarted)
         {
+            //obtenemos el luchador del cliente
             fighter = onlinePlayers[clientId].GetComponent<PlayerInformation>().FighterObject;
             if (fighter)
             {
+                //se mata al luchador
                 new TakeHitCommand(fighter.GetComponent<FighterMovement>(), 999).Execute();
+
+                //seteamos la variable isDisconnected a true 
                 fighter.GetComponent<FighterInformation>().IsDisconnected = true;
             }
-            else Debug.Log("PERSONAJE NO ENCONETRADO");
         }
-        else
+        else //de no haber empezado la partida, se elimina de la lobby y se elimina del diccionario
         {
             lobby.RemovePlayerFromLobby(clientId);
             onlinePlayers.Remove(clientId);

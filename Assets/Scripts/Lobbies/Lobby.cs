@@ -9,15 +9,15 @@ public class Lobby
 {
     private int lobbyId = -1;
     private bool isPrivate = false;
-    private bool isStarted = false;
+    private bool isStarted = false; //sirve para que nadie entre al lobby cuando empiece una partida
     private int roundNumber = 1;
     private int roundTime = 5;
     private string password = "";
 
 
-    private List<PlayerInformation> playersInformation = new();
+    private List<PlayerInformation> playersInformation = new(); //lista de la informacion de los jugadores que hay en la sala
     private const int MAX_PLAYERS = 4;
-    private List<ulong> readyPlayers = new();
+    private List<ulong> readyPlayers = new();   //lista empleada para la gestion de los jugadores listos
 
     private OnlinePlayers onlinePlayers;
     private LobbyManager lobbyManager;
@@ -75,7 +75,7 @@ public class Lobby
         get { return password; }
     }
 
-
+    //constructor para crear lobby publica
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager)
     {
         //ACTUALIZAR VALORES EN PLAYER INFORMATION
@@ -90,8 +90,10 @@ public class Lobby
 
     }
 
+    //constructor para lobby privada
     public Lobby(PlayerInformation creator, int idLobby, LobbyManager lobbyManager, string password)
     {
+        //ACTUALIZAR VALORES EN PLAYER INFORMATION
         creator.IdInLobby = 0;
         creator.CurrentLobbyId = idLobby;
         playersInformation.Add(creator);
@@ -116,6 +118,7 @@ public class Lobby
         lobbyManager.LobbyEliminated -= EliminarLobby;
     }*/
 
+    //metodo que intenta añadir jugador a la sala, falla si esta llena o el jugador ya esta dentro
     public bool AddPlayerToLobby(ulong playerId)
     {
         if (playersInformation.Count >= MAX_PLAYERS) return false;
@@ -135,6 +138,8 @@ public class Lobby
         return true;
     }
 
+
+    // metodo que elimina a un jugador especificado de la sala
     public void RemovePlayerFromLobby(ulong playerId)
     {
         PlayerInformation player = onlinePlayers.ReturnPlayerInformation(playerId);
@@ -150,28 +155,25 @@ public class Lobby
         //PONER POR DEFECTO LOS VALORES DE LOBBY EN PLAYER INFORMATION
         player.ResetAfterExitingLobby();
 
-        Debug.Log($"ELIMINADO A {playerId}");
     }
 
+    //metodo que gestiona cuando un jugador esta listo, si NO estaba ready lo pone a ready y viceversa
     public void PlayerReady(ulong playerId)
     {
         foreach (var id in readyPlayers)
         {
             if (id == playerId)
             {
-                Debug.Log("YA NO LISTO: " + id);
+
                 readyPlayers.Remove(id);
                 return;
             }
         }
 
         readyPlayers.Add(playerId);
-        foreach (var player in readyPlayers)
-        {
-            Debug.Log("LISTO:" + player);
-        }
     }
 
+    //devuelve si un jugador esta ready o no
     public bool IsPlayerReady(ulong playerId)
     {
         foreach (var id in readyPlayers)
@@ -183,6 +185,7 @@ public class Lobby
         return false;
     }
 
+    //metodo que devuelve una lista con los ids de los jugadores de la sala
     public List<ulong> GetPlayersIdsList()
     {
         List<ulong> ids = new List<ulong>();
@@ -193,12 +196,12 @@ public class Lobby
         return ids;
     }
 
+    //metodo que elimina a todos los jugadores de la sala, restablenciendola a su estado original
     public void RemoveAllPlayers()
     {
 
         foreach (var player in playersInformation)
         {
-            Debug.Log("Eliminando de la lobby a: " + player.Username);
             player.ResetAfterExitingLobby();
             if (player.FighterObject.GetComponent<FighterInformation>().IsDisconnected)
             {
