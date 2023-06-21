@@ -54,7 +54,6 @@ public class MatchUI : NetworkBehaviour
     {
         //Debug.Log($"{NetworkManager.LocalClientId}: Intentando suscribir interfaz de vidas.");
         healthManager.DmgTakenEvent += UpdateUIHealth;
-        healthManager.DeadEvent += UpdateUIHealth;
         healthManager.ResetHealthEvent += UpdateUIHealth;
     }
 

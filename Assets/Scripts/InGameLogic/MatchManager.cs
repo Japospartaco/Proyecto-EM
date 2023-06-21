@@ -69,9 +69,7 @@ public class MatchManager : NetworkBehaviour
     {
         Debug.Log("Destruyendo la partida.");
 
-        Match desiredToDestroy = ReturnMatch(match);
-
-        foreach(var player in desiredToDestroy.Players)
+        foreach(var player in match.Players)
         {
             Destroy(player.FighterObject);
         }

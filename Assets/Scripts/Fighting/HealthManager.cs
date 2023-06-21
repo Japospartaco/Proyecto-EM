@@ -19,7 +19,6 @@ public class HealthManager : MonoBehaviour
     //public DmgEvent DmgTaken = new DmgEvent();
     public EventHandler<GameObject> ResetHealthEvent;
     public EventHandler<GameObject> DmgTakenEvent;
-    public EventHandler<GameObject> DeadEvent;
 
     private void Start()
     {
@@ -40,15 +39,15 @@ public class HealthManager : MonoBehaviour
     public void TakeDmg(int dmg)
     {
         healthPoints -= dmg;
-        DmgTakenEvent?.Invoke(this, gameObject); //DESDE AQUI QUIERO ACTUALIZAR LAS VIDAS
         Debug.Log("Me han pegado");
         if (healthPoints <= 0)
         {
             Debug.Log("Me he muerto");
             healthPoints = 0;
             new DieCommand(character).Execute();
-            DeadEvent?.Invoke(this, gameObject);
         }
+
+        DmgTakenEvent?.Invoke(this, gameObject); //DESDE AQUI QUIERO ACTUALIZAR LAS VIDAS
     }
 }
 

@@ -118,11 +118,18 @@ public class Match
         else
             Debug.Log($"Ronda {current_round} empatada.");
 
-        if ((DesconectadosInGame() == players.Count - 1) || (current_round == MAX_ROUNDS))
+        int desconectados = DesconectadosInGame();
+
+        if ((desconectados == players.Count - 1) || (current_round == MAX_ROUNDS))
         {
             EndMatch();
         } 
-        else
+        else if (desconectados == players.Count)
+        {
+            lobby.RemoveAllPlayers();
+            matchManager.Destroy(this);
+        }
+        else 
 		{
             StartRoundFromMatch();
             Debug.Log("Empezando siguiente ronda...");
