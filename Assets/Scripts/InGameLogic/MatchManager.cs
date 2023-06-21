@@ -1,3 +1,4 @@
+using Movement.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,13 +25,19 @@ public class MatchManager : NetworkBehaviour
     public void AddEventStartMatch(Match match)
     {
         if (!IsServer) return;
-        matchUI.SuscribirInicializarUIHealth(match); // Suscribirse al evento de inicio del partido para inicializar la interfaz de salud
+        matchUI.SuscribirInicializarUIMatch(match); // Suscribirse al evento de inicio del partido para inicializar la interfaz de salud
     }
 
-    public void AddEventHealthInterface(HealthManager fighterDamaged)
+    public void AddEventFighterMovement(FighterMovement fighterMovement)
     {
         if (!IsServer) return;
-        matchUI.SuscribirInterfazVidas(fighterDamaged); // Suscribirse al evento de interfaz de salud para actualizar la interfaz cuando un luchador recibe daño
+        matchUI.SuscribirUIFighterMovement(fighterMovement);
+    }
+
+    public void AddEventHealthManager(HealthManager fighterDamaged)
+    {
+        if (!IsServer) return;
+        matchUI.SuscribirUIHealthManager(fighterDamaged); // Suscribirse al evento de interfaz de salud para actualizar la interfaz cuando un luchador recibe daño
     }
 
     public void AddEventTimerMatch(CountdownTimer countdownTimer)

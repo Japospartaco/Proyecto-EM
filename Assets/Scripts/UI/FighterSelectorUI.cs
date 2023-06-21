@@ -239,7 +239,8 @@ public class FighterSelectorUI : NetworkBehaviour
         GameObject lobbiesLayersGameObject = GameObject.FindGameObjectWithTag("Lobbies");
         AssignLayerRecursively(characterGameObject, lobbiesLayersGameObject.transform.GetChild(lobby.LobbyId).gameObject.layer);
 
-        matchManager.AddEventHealthInterface(characterGameObject.GetComponent<HealthManager>());
+        matchManager.AddEventHealthManager(characterGameObject.GetComponent<HealthManager>());
+        matchManager.AddEventFighterMovement(characterGameObject.GetComponent<FighterMovement>()); 
 
         NetworkObject networkObject = characterGameObject.GetComponent<NetworkObject>();
         networkObject.SpawnWithOwnership(id);
