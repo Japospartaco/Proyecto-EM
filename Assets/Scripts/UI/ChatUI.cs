@@ -12,6 +12,7 @@ public class ChatUI : NetworkBehaviour
 
     [Header("Cuadros de texto de los mensajes")]
     [SerializeField] List<TMP_Text> textBoxMensajesList;
+    [SerializeField] InputField messageInputField;
 
     [Header("Clases auxiliares")]
     [SerializeField] LobbyManager lobbyManager;
@@ -46,7 +47,6 @@ public class ChatUI : NetworkBehaviour
         }
         ulong id = NetworkManager.LocalClientId;
         ReadStringServerRpc(id, message);
-        
     }
 
     [ServerRpc(RequireOwnership = false)]

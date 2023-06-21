@@ -7132,7 +7132,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &777232092
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7481,7 +7481,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &845733402
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18797,7 +18797,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1223964742
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -25361,7 +25361,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1664556991
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -26136,7 +26136,6 @@ MonoBehaviour:
   - {fileID: 1223964740}
   arrowOwnPlayer: {fileID: 21300000, guid: 5eb8f297016218a49a8bdfcb29a323c5, type: 3}
   arrowEnemyPlayer: {fileID: 21300000, guid: 5591fbe38d1c6584e94a1b5877fab99a, type: 3}
-  arrowOffset: 0
   fighterIcons:
   - {fileID: 21300000, guid: 6c5103cc00ef62849b4bcd796593ebd8, type: 3}
   - {fileID: 21300000, guid: ae0f0744839ee5d48aaac0cc70626300, type: 3}
@@ -26199,10 +26198,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ChatUIObject: {fileID: 845733401}
   textBoxMensajesList:
-  - {fileID: 1216662078}
-  - {fileID: 1710709953}
-  - {fileID: 397357465}
   - {fileID: 36346018}
+  - {fileID: 397357465}
+  - {fileID: 1710709953}
+  - {fileID: 1216662078}
   lobbyManager: {fileID: 476110321}
   onlinePlayers: {fileID: 476110322}
 --- !u!1 &1773060825
@@ -29420,7 +29419,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &2061064408
 SpriteRenderer:
   m_ObjectHideFlags: 0
