@@ -40,6 +40,7 @@ namespace Movement.Components
         bool allowedMovement = true; // Indica si el movimiento está permitido
 
         public EventHandler<GameObject> DieEvent; // Evento que se dispara cuando el luchador muere
+        public EventHandler<GameObject> fighterArrowUIEvent; //Evento que se dispara para actualziar la posicion de la flecha del jugador
 
         public SemaphoreSlim EsperandoMorir = new SemaphoreSlim(0); // Semáforo para esperar la muerte del luchador
 
@@ -84,6 +85,8 @@ namespace Movement.Components
             _animator.SetFloat(AnimatorSpeed, this._direction.magnitude);
             _animator.SetFloat(AnimatorVSpeed, this._rigidbody2D.velocity.y);
             _animator.SetBool(AnimatorGrounded, this._grounded);
+
+            fighterArrowUIEvent?.Invoke(this, gameObject);
         }
 
         void FixedUpdate()

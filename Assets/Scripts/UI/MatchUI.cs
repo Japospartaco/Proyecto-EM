@@ -1,3 +1,4 @@
+using Movement.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,13 +17,16 @@ public class MatchUI : NetworkBehaviour
     [Header("Tiempo")]
     [SerializeField] private TMP_Text textBoxTimer;
 
-    [Header("Interfaz de vida")]
+    [Header("Elementos de la interfaz de los jugadores")]
     [SerializeField] List<GameObject> playerContainerList;
     [SerializeField] List<Image> playerImageList;
     [SerializeField] List<TMP_Text> playerUsernameList;
     [SerializeField] List<TMP_Text> playerHealthList;
+    [SerializeField] List<GameObject> playerPlaceArrow;
+    [SerializeField] Sprite arrowOwnPlayer;
+    [SerializeField] Sprite arrowEnemyPlayer;
 
-    [Header("Imagenes")]
+    [Header("Imagenes de personaje")]
     [SerializeField] List<Sprite> fighterIcons;
 
     [Header("Clases auxiliares")]
@@ -45,17 +49,23 @@ public class MatchUI : NetworkBehaviour
         }
     }
 
-    public void SuscribirInicializarUIHealth(Match match)
+    public void SuscribirInicializarUIMatch(Match match)
     {
         // Suscribe el evento StartMatch al método InitializeUIHealth
-        match.StartMatch += InitializeUIHealth;
+        match.StartMatch += InitializeUI;
     }
 
-    public void SuscribirInterfazVidas(HealthManager healthManager)
+    public void SuscribirUIFighterMovement(FighterMovement fighter)
+    {
+        fighter.fighterArrowUIEvent += UpdateArrowPosition;
+    }
+
+    public void SuscribirUIHealthManager(HealthManager healthManager)
     {
         // Suscribe los eventos DmgTakenEvent y ResetHealthEvent del HealthManager a UpdateUIHealth
         healthManager.DmgTakenEvent += UpdateUIHealth;
         healthManager.ResetHealthEvent += UpdateUIHealth;
+        healthManager.ResetHealthEvent += ActivateArrow;
     }
 
     public void SuscribirTiempo(CountdownTimer countdownTimer)
@@ -70,7 +80,7 @@ public class MatchUI : NetworkBehaviour
         match.EndMatchEvent += UpdateEndUI;
     }
 
-    public void InitializeUIHealth(object sender, Match match)
+    public void InitializeUI(object sender, Match match)
     {
         // Obtiene la lista de jugadores en el lobby de la partida
         List<PlayerInformation> listPlayers = match.Lobby.PlayersList;
@@ -92,17 +102,19 @@ public class MatchUI : NetworkBehaviour
 
             string user = player.Username;
             string health = $"{healthManager.healthPoints}/{healthManager.maxHealth}";
+            ulong clientId = player.Id;
             int selectedFighter = player.SelectedFighter;
 
             Debug.Log($"SERVIDOR: Inicializando la UI de {user}, con {health} vida y {selectedFighter} personajes seleccionado.");
 
             // Invoca el RPC para inicializar la UI de salud en los clientes
-            InitializeUIHealthClientRpc(i, user, health, selectedFighter, clientRpcParams);
+            InitializeUIClientRpc(i, user, clientId, health, selectedFighter, clientRpcParams);
         }
     }
 
+
     [ClientRpc]
-    void InitializeUIHealthClientRpc(int index, string user, string health, int selectedFighter, ClientRpcParams clientRpcParams = default)
+    void InitializeUIClientRpc(int index, string user, ulong clientId, string health, int selectedFighter, ClientRpcParams clientRpcParams = default)
     {
         // Restaura el color original y la imagen en blanco del contenedor del jugador
         playerContainerList[index].GetComponent<Image>().color = originalColorList[index];
@@ -110,13 +122,78 @@ public class MatchUI : NetworkBehaviour
 
         // Activa el contenedor del jugador
         playerContainerList[index].SetActive(true);
+        playerPlaceArrow[index].SetActive(true);
 
         // Configura la imagen del jugador con el sprite correspondiente al personaje seleccionado
         playerImageList[index].sprite = fighterIcons[selectedFighter];
 
+        if (NetworkManager.LocalClientId == clientId)
+        {
+            playerPlaceArrow[index].GetComponent<SpriteRenderer>().sprite = arrowOwnPlayer;
+            Debug.Log("Actualizando flechita.");
+        }
+
         // Establece el nombre de usuario y la salud del jugador en la UI
         playerUsernameList[index].text = user;
         playerHealthList[index].text = health;
+    }
+
+    public void UpdateArrowPosition(object sender, GameObject fighter)
+    {
+        if (fighter.GetComponent<FighterInformation>().IsDisconnected) { return; }
+
+        // Obtiene el HealthManager y la información del jugador del luchador
+        Vector3 position = fighter.transform.position;
+        PlayerInformation player = fighter.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>();
+
+        // Obtiene el ID del lobby del jugador y el lobby correspondiente
+        int lobbyId = lobbyManager.GetPlayersLobby(player.Id);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        // Configura los parámetros de envío del RPC a todos los clientes del lobby
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobby.GetPlayersIdsList()
+            }
+        };
+
+        UpdateArrowPositionClientRpc(position.x, position.y, position.z, player.IdInLobby, clientRpcParams);
+    }
+
+    [ClientRpc]
+    void UpdateArrowPositionClientRpc(float x, float y, float z, int idInLobby, ClientRpcParams clientRpcParams)
+    {
+        GameObject arrow = playerPlaceArrow[idInLobby];
+
+        Vector3 newPosition = new Vector3(x, y, z);
+        arrow.transform.position = newPosition;
+    }
+
+    void ActivateArrow(object sender, GameObject deadFighter)
+    {
+        PlayerInformation player = deadFighter.GetComponent<FighterInformation>().Player.GetComponent<PlayerInformation>();
+
+        // Obtiene el ID del lobby del jugador y el lobby correspondiente
+        int lobbyId = lobbyManager.GetPlayersLobby(player.Id);
+        Lobby lobby = lobbyManager.GetLobbyFromId(lobbyId);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobby.GetPlayersIdsList()
+            }
+        };
+
+        ActivateArrowClientRpc(player.IdInLobby, clientRpcParams);
+    }
+
+    [ClientRpc]
+    void ActivateArrowClientRpc(int IdInLobby, ClientRpcParams clientRpcParams = default)
+    {
+        playerPlaceArrow[IdInLobby].SetActive(true);
     }
 
     public void UpdateUIHealth(object sender, GameObject fighterDamaged)
@@ -167,6 +244,7 @@ public class MatchUI : NetworkBehaviour
 
         // Actualiza el texto de la salud del jugador en la UI
         playerHealthList[idInLobby].text = text;
+
     }
 
     [ClientRpc]
@@ -178,6 +256,9 @@ public class MatchUI : NetworkBehaviour
 
         // Actualiza el texto de la salud del jugador en la UI
         playerHealthList[idInLobby].text = text;
+
+        // Actualiza la posicion de la flecha del personaje
+        playerPlaceArrow[idInLobby].SetActive(false);
     }
 
     public void UpdateUITimer(object sender, Match match)
@@ -232,7 +313,7 @@ public class MatchUI : NetworkBehaviour
             }
         };
 
-        for(int i = 0; i < match.Lobby.PlayersList.Count;i++)
+        for (int i = 0; i < match.Lobby.PlayersList.Count; i++)
         {
             DesactivateUIContainersClientRpc(i, clientRpcParams);
         }
@@ -252,10 +333,9 @@ public class MatchUI : NetworkBehaviour
     [ClientRpc]
     void DesactivateUIContainersClientRpc(int index, ClientRpcParams clientRpcParams = default)
     {
-         playerContainerList[index].SetActive(false);
+        playerContainerList[index].SetActive(false);
+        playerPlaceArrow[index].GetComponent<SpriteRenderer>().sprite = arrowEnemyPlayer;
+        playerPlaceArrow[index].SetActive(false);
     }
-
-
-
 
 }
